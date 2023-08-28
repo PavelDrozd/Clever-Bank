@@ -1,0 +1,9 @@
+database:
+  driver: org.postgresql.Driver
+  url: jdbc:postgresql://localhost:5432/bankmanager
+  user: postgres
+  password: root
+  min: 2
+  max: 100
+  autocommit: false
+  timeout: 5
