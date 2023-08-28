@@ -19,18 +19,19 @@ public class DataSourceManager {
     private static final String DB_AUTO_COMMIT = "database.autocommit";
     private static final String DB_LOGIN_TIMEOUT = "database.timeout";
     private final HikariDataSource dataSource;
+    private final ConfigurationYamlManager yaml = ConfigurationYamlManager.INSTANCE;
 
     private DataSourceManager() {
         try {
             dataSource = new HikariDataSource();
-            dataSource.setDriverClassName(ConfigurationYamlManager.INSTANCE.getProperty(DB_DRIVER));
-            dataSource.setJdbcUrl(ConfigurationYamlManager.INSTANCE.getProperty(DB_URL));
-            dataSource.setUsername(ConfigurationYamlManager.INSTANCE.getProperty(DB_USER));
-            dataSource.setPassword(ConfigurationYamlManager.INSTANCE.getProperty(DB_PASSWORD));
-            dataSource.setMinimumIdle(Integer.parseInt(ConfigurationYamlManager.INSTANCE.getProperty(DB_MIN_POOL)));
-            dataSource.setMaximumPoolSize(Integer.parseInt(ConfigurationYamlManager.INSTANCE.getProperty(DB_MAX_POOL)));
-            dataSource.setAutoCommit(Boolean.parseBoolean(ConfigurationYamlManager.INSTANCE.getProperty(DB_AUTO_COMMIT)));
-            dataSource.setLoginTimeout(Integer.parseInt(ConfigurationYamlManager.INSTANCE.getProperty(DB_LOGIN_TIMEOUT)));
+            dataSource.setDriverClassName(yaml.getProperty(DB_DRIVER));
+            dataSource.setJdbcUrl(yaml.getProperty(DB_URL));
+            dataSource.setUsername(yaml.getProperty(DB_USER));
+            dataSource.setPassword(yaml.getProperty(DB_PASSWORD));
+            dataSource.setMinimumIdle(Integer.parseInt(yaml.getProperty(DB_MIN_POOL)));
+            dataSource.setMaximumPoolSize(Integer.parseInt(yaml.getProperty(DB_MAX_POOL)));
+            dataSource.setAutoCommit(Boolean.parseBoolean(yaml.getProperty(DB_AUTO_COMMIT)));
+            dataSource.setLoginTimeout(Integer.parseInt(yaml.getProperty(DB_LOGIN_TIMEOUT)));
         } catch (SQLException e) {
             throw new ConnectionException(e);
         }
@@ -38,5 +39,9 @@ public class DataSourceManager {
 
     public DataSource getDataSource() {
         return dataSource;
+    }
+
+    public void close(){
+        dataSource.close();
     }
 }
