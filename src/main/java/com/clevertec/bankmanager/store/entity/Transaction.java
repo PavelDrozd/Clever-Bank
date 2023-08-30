@@ -2,6 +2,8 @@ package com.clevertec.bankmanager.store.entity;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class Transaction {
 
@@ -9,7 +11,9 @@ public class Transaction {
 
     private Double amount;
 
-    private Account recipient;
+    private LocalDateTime dateTime;
 
-    private Account sender;
+    private Account recipientAccount;
+
+    private Account senderAccount;
 }

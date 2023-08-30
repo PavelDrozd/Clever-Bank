@@ -5,5 +5,5 @@ database:
   password: root
   min: 2
   max: 100
-  autocommit: false
+  autocommit: true
   timeout: 5

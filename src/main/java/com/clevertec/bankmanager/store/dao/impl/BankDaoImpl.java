@@ -23,7 +23,7 @@ public class BankDaoImpl implements BankDao {
     private static final String SELECT_BANK_BY_ID = SELECT_BANK + FROM_BANK + "WHERE b.id = ?";
     private static final String SELECT_ALL_BANKS = SELECT_BANK + FROM_BANK;
     private static final String UPDATE_BANK = "UPDATE banks SET name = ? WHERE id = ? ";
-    private static final String DELETE_BANK = "DELETE banks b WHERE b.id = ?";
+    private static final String DELETE_BANK = "DELETE FROM banks b WHERE b.id = ?";
 
     private final DataSource dataSource;
 
@@ -81,6 +81,7 @@ public class BankDaoImpl implements BankDao {
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(UPDATE_BANK);
             statement.setString(1, bank.getName());
+            statement.setLong(2, bank.getId());
             statement.executeUpdate();
             return getById(bank.getId());
         } catch (SQLException e) {

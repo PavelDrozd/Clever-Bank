@@ -3,6 +3,8 @@ package com.clevertec.bankmanager.data.dto;
 import com.clevertec.bankmanager.store.entity.Account;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class TransactionDto {
 
@@ -10,7 +12,9 @@ public class TransactionDto {
 
     private Double amount;
 
-    private Account recipient;
+    private LocalDateTime dateTime;
 
-    private Account sender;
+    private Account recipientAccount;
+
+    private Account senderAccount;
 }

@@ -1,6 +1,7 @@
 package com.clevertec.bankmanager.store.dao.impl;
 
 import com.clevertec.bankmanager.shared.exception.store.dao.DaoException;
+import com.clevertec.bankmanager.store.dao.AccountDao;
 import com.clevertec.bankmanager.store.dao.TransactionDao;
 import com.clevertec.bankmanager.store.entity.Transaction;
 import lombok.RequiredArgsConstructor;
@@ -11,21 +12,25 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
 public class TransactionDaoImpl implements TransactionDao {
 
-    private static final String SELECT_TRANSACTION = "SELECT t.id, t.amount t.recipient_id t.sender_id ";
+    private static final String SELECT_TRANSACTION = "SELECT t.id, t.amount, t.date_time, t.recipient_id, t.sender_id ";
     private static final String FROM_TRANSACTION = "FROM transactions t ";
-    private static final String INSERT_TRANSACTION = "INSERT INTO transactions (name) VALUES (?)";
+    private static final String INSERT_TRANSACTION =
+            "INSERT INTO transactions (amount, date_time, recipient_id, sender_id) VALUES (?, ?, ?, ?)";
     private static final String SELECT_TRANSACTION_BY_ID = SELECT_TRANSACTION + FROM_TRANSACTION + "WHERE t.id = ?";
     private static final String SELECT_ALL_TRANSACTIONS = SELECT_TRANSACTION + FROM_TRANSACTION;
-    private static final String UPDATE_TRANSACTION = "UPDATE transactions SET name = ? WHERE id = ? ";
-    private static final String DELETE_TRANSACTION = "DELETE transactions t WHERE t.id = ?";
+    private static final String UPDATE_TRANSACTION =
+            "UPDATE transactions SET amount = ?, date_time = ?, recipient_id = ?, sender_id = ? WHERE id = ? ";
+    private static final String DELETE_TRANSACTION = "DELETE FROM transactions t WHERE t.id = ?";
 
     private final DataSource dataSource;
+    private final AccountDao accountDao;
 
     @Override
     public Transaction create(Transaction transaction) {
@@ -33,6 +38,9 @@ public class TransactionDaoImpl implements TransactionDao {
             PreparedStatement statement = connection.prepareStatement(//
                     INSERT_TRANSACTION, Statement.RETURN_GENERATED_KEYS);
             statement.setDouble(1, transaction.getAmount());
+            statement.setObject(2, transaction.getDateTime());
+            statement.setLong(3, transaction.getRecipientAccount().getId());
+            statement.setLong(4, transaction.getSenderAccount().getId());
             statement.executeUpdate();
             ResultSet key = statement.getGeneratedKeys();
             Transaction created = new Transaction();
@@ -81,6 +89,10 @@ public class TransactionDaoImpl implements TransactionDao {
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(UPDATE_TRANSACTION);
             statement.setDouble(1, transaction.getAmount());
+            statement.setObject(2, transaction.getDateTime());
+            statement.setLong(3, transaction.getRecipientAccount().getId());
+            statement.setLong(4, transaction.getSenderAccount().getId());
+            statement.setLong(5, transaction.getId());
             statement.executeUpdate();
             return getById(transaction.getId());
         } catch (SQLException e) {
@@ -104,6 +116,9 @@ public class TransactionDaoImpl implements TransactionDao {
         Transaction transaction = new Transaction();
         transaction.setId(result.getLong("id"));
         transaction.setAmount(result.getDouble("amount"));
+        transaction.setDateTime(result.getObject("date_time", LocalDateTime.class));
+        transaction.setRecipientAccount(accountDao.getById(result.getLong("recipient_id")));
+        transaction.setSenderAccount(accountDao.getById(result.getLong("sender_id")));
         return transaction;
     }
 }

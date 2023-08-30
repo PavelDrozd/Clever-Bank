@@ -23,9 +23,9 @@ public enum DaoFactory {
         DataSource dataSource = DataSourceManager.INSTANCE.getDataSource();
 
         map.put(UserDao.class, new UserDaoImpl(dataSource));
-        map.put(AccountDao.class, new AccountDaoImpl(dataSource));
         map.put(BankDao.class, new BankDaoImpl(dataSource));
-        map.put(TransactionDao.class, new TransactionDaoImpl(dataSource));
+        map.put(AccountDao.class, new AccountDaoImpl(dataSource, getDao(BankDao.class), getDao(UserDao.class)));
+        map.put(TransactionDao.class, new TransactionDaoImpl(dataSource, getDao(AccountDao.class)));
     }
 
     @SuppressWarnings("unchecked")

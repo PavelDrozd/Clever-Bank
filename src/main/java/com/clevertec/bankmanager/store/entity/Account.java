@@ -2,14 +2,20 @@ package com.clevertec.bankmanager.store.entity;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 public class Account {
 
     private Long id;
 
+    private Long number;
+
     private Double amount;
 
-    private Long bankId;
+    private LocalDate cashbackLastDate;
 
-    private Long userId;
+    private Bank bank;
+
+    private User user;
 }
