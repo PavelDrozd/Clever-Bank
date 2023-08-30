@@ -7,3 +7,8 @@ database:
   max: 100
   autocommit: true
   timeout: 5
+cashback:
+  delay: 0
+  period: 30
+  percent: 1
+  test: true

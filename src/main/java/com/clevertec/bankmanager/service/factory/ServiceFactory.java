@@ -4,6 +4,7 @@ import com.clevertec.bankmanager.service.AccountService;
 import com.clevertec.bankmanager.service.BankService;
 import com.clevertec.bankmanager.service.TransactionService;
 import com.clevertec.bankmanager.service.UserService;
+import com.clevertec.bankmanager.service.executor.CashbackScheduleExecutorService;
 import com.clevertec.bankmanager.service.impl.AccountServiceImpl;
 import com.clevertec.bankmanager.service.impl.BankServiceImpl;
 import com.clevertec.bankmanager.service.impl.TransactionServiceImpl;
@@ -29,6 +30,7 @@ public enum ServiceFactory {
         map.put(BankService.class, new BankServiceImpl(DaoFactory.INSTANCE.getDao(BankDao.class)));
         map.put(TransactionService.class, new TransactionServiceImpl(
                 DaoFactory.INSTANCE.getDao(TransactionDao.class), DaoFactory.INSTANCE.getDao(AccountDao.class)));
+        map.put(CashbackScheduleExecutorService.class, CashbackScheduleExecutorService.getInstance());
     }
 
     @SuppressWarnings("unchecked")
