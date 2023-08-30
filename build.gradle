@@ -21,6 +21,8 @@ dependencies {
     implementation 'com.zaxxer:HikariCP:5.0.1'
     implementation 'org.modelmapper:modelmapper:3.1.1'
     implementation 'org.yaml:snakeyaml:2.1'
+    implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation 'org.slf4j:slf4j-simple:2.0.7'
 
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
