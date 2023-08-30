@@ -6,10 +6,12 @@ import com.clevertec.bankmanager.shared.exception.service.ServiceException;
 import com.clevertec.bankmanager.shared.exception.service.ServiceValidationException;
 import com.clevertec.bankmanager.shared.exception.store.dao.DaoException;
 import com.clevertec.bankmanager.shared.util.mapper.EntityDtoMapper;
+import com.clevertec.bankmanager.shared.util.writer.ChequeWriter;
 import com.clevertec.bankmanager.store.dao.AccountDao;
 import com.clevertec.bankmanager.store.dao.TransactionDao;
 import com.clevertec.bankmanager.store.entity.Transaction;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,8 +30,11 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionDto create(TransactionDto transactionDto) {
         try {
+            transactionDto.setDateTime(LocalDateTime.now());
             Transaction transaction = transactionDao.create(mapper.mapToTransaction(transactionDto));
-            return mapper.mapToTransactionDto(transaction);
+            TransactionDto created = mapper.mapToTransactionDto(transaction);
+            ChequeWriter.writeCheck(created);
+            return created;
         } catch (DaoException e) {
             throw new ServiceException(e);
         }
@@ -60,7 +65,9 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionDto update(TransactionDto transactionDto) {
         try {
             Transaction transaction = transactionDao.update(mapper.mapToTransaction(transactionDto));
-            return mapper.mapToTransactionDto(transaction);
+            TransactionDto updated = mapper.mapToTransactionDto(transaction);
+            ChequeWriter.writeCheck(updated);
+            return updated;
         } catch (DaoException e) {
             throw new ServiceException(e);
         }
