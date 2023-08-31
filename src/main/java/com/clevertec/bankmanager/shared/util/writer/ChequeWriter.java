@@ -19,7 +19,7 @@ public class ChequeWriter {
     public static void writeCheck(TransactionDto transaction) {
         LocalDateTime dateTime = transaction.getDateTime();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_hh.mm.ss");
-        Path path = Paths.get("check/transaction" + dateTime.format(formatter) + ".txt");
+        Path path = Paths.get("cheque/transaction" + dateTime.format(formatter) + ".txt");
         checkDirectoryAndFile(path);
         String text = formatText(transaction);
         try {
