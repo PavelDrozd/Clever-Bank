@@ -31,10 +31,7 @@ public class CashbackAccountServiceImpl implements CashbackAccountService {
                 if (!cashbackLastDate.getMonth().equals(dateNow.getMonth()) || isTestCashback) {
                     int daysInMoth = dateNow.lengthOfMonth();
                     if (dateNow.getDayOfMonth() == daysInMoth || isTestCashback) {
-                        double cashback = (amount / 100) * cashbackPercent;
-                        account.setAmount(account.getAmount() + cashback);
-                        account.setCashbackLastDate(dateNow);
-                        accountDao.update(account);
+                        accountDao.cashback(account, dateNow, cashbackPercent);
                     }
                 }
             }

@@ -1,5 +1,6 @@
 package com.clevertec.bankmanager.store.dao.impl;
 
+import com.clevertec.bankmanager.shared.exception.store.dao.DaoConcurrencyException;
 import com.clevertec.bankmanager.shared.exception.store.dao.DaoException;
 import com.clevertec.bankmanager.shared.exception.store.dao.DaoValidationException;
 import com.clevertec.bankmanager.store.dao.AccountDao;
@@ -18,6 +19,7 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 public class AccountDaoImpl implements AccountDao {
@@ -117,41 +119,95 @@ public class AccountDaoImpl implements AccountDao {
     }
 
     @Override
-    public Account deposit(Long id, Double value) {
-        Account account = getById(id);
-        Double currentAmount = account.getAmount();
-        account.setAmount(currentAmount + value);
-        return update(account);
-    }
-
-    @Override
-    public Account withdraw(Long id, Double value) {
-        Account account = getById(id);
-        Double currentAmount = account.getAmount();
-        if (currentAmount < value) {
-            throw new DaoValidationException("Amount on account less than withdraw value: " + value);
+    public Account deposit(Account account, Double value) {
+        Account current = getById(account.getId());
+        try {
+            if (current.getLock().tryLock(10, TimeUnit.SECONDS)) {
+                Double currentAmount = current.getAmount();
+                current.setAmount(currentAmount + value);
+                return update(current);
+            }
+        } catch (InterruptedException e) {
+            throw new DaoException(e);
+        } finally {
+            current.getLock().unlock();
         }
-        account.setAmount(currentAmount - value);
-        return update(account);
-
+        throw new DaoConcurrencyException("Waiting lock");
     }
 
     @Override
-    public Transaction transfer(Long senderAccountId, Long recipientAccountId, Double value) {
+    public Account withdraw(Account account, Double value) {
+        Account current = getById(account.getId());
+        try {
+            if (current.getLock().tryLock(10, TimeUnit.SECONDS)) {
+                Double currentAmount = current.getAmount();
+                if (currentAmount < value) {
+                    throw new DaoValidationException("Amount on account less than withdraw value: " + value);
+                }
+                current.setAmount(currentAmount - value);
+                return update(current);
+            }
+        } catch (InterruptedException e) {
+            throw new DaoException(e);
+        } finally {
+            current.getLock().unlock();
+        }
+        throw new DaoConcurrencyException("Waiting lock");
+    }
+
+    @Override
+    public Transaction transfer(Account senderAccount, Account recipientAccount, Double value) {
         Connection connection = null;
         try {
             connection = dataSource.getConnection();
             connection.setAutoCommit(false);
             Transaction transaction = new Transaction();
-            transaction.setAmount(value);
-            transaction.setSenderAccount(withdraw(senderAccountId, value));
-            transaction.setRecipientAccount(deposit(recipientAccountId, value));
-            return transaction;
+            if (senderAccount.getLock().tryLock(10, TimeUnit.SECONDS)) {
+                try {
+                    if (recipientAccount.getLock().tryLock(10, TimeUnit.SECONDS)) {
+                        try {
+                            transaction.setAmount(value);
+                            transaction.setSenderAccount(withdraw(senderAccount, value));
+                            transaction.setRecipientAccount(deposit(recipientAccount, value));
+                            return transaction;
+                        } finally {
+                            recipientAccount.getLock().unlock();
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    throw new DaoConcurrencyException(e);
+                } finally {
+                    senderAccount.getLock().unlock();
+                }
+            }
         } catch (SQLException e) {
             throw new DaoException(e);
+        } catch (InterruptedException e) {
+            throw new DaoConcurrencyException(e);
         } finally {
             setAutoCommitTrue(connection);
         }
+        throw new DaoConcurrencyException("Waiting lock");
+    }
+
+
+    @Override
+    public Account cashback(Account account, LocalDate cashbackLastDate, Double percent) {
+        Account current = getById(account.getId());
+        try {
+            if (current.getLock().tryLock(10, TimeUnit.SECONDS)) {
+                double currentAmount = current.getAmount();
+                double cashback = (currentAmount / 100) * percent;
+                current.setAmount(Double.sum(currentAmount, percent));
+                current.setCashbackLastDate(cashbackLastDate);
+                return update(current);
+            }
+        } catch (InterruptedException e) {
+            throw new DaoConcurrencyException(e);
+        } finally {
+            current.getLock().unlock();
+        }
+        throw new DaoConcurrencyException("Waiting lock");
     }
 
     private void setAutoCommitTrue(Connection connection) {

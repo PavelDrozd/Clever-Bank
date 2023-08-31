@@ -75,9 +75,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountDto deposit(Long id, Double value) {
+    public AccountDto deposit(AccountDto accountDto, Double value) {
         try {
-            Account account = accountDao.deposit(id, value);
+            Account account = accountDao.deposit(mapper.mapToAccount(accountDto), value);
             return mapper.mapToAccountDto(account);
         } catch (DaoException e) {
             throw new ServiceException(e);
@@ -85,9 +85,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountDto withdraw(Long id, Double value) {
+    public AccountDto withdraw(AccountDto accountDto, Double value) {
         try {
-            Account account = accountDao.withdraw(id, value);
+            Account account = accountDao.withdraw(mapper.mapToAccount(accountDto), value);
             return mapper.mapToAccountDto(account);
         } catch (DaoException e) {
             throw new ServiceException(e);
