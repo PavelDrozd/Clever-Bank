@@ -196,7 +196,7 @@ public class AccountDaoImpl implements AccountDao {
         Account current = getById(account.getId());
         try {
             if (current.getLock().tryLock(10, TimeUnit.SECONDS)) {
-                double currentAmount = current.getAmount();
+                double currentAmount = getValidAmount(current);
                 double cashback = (currentAmount / 100) * percent;
                 current.setAmount(Double.sum(currentAmount, percent));
                 current.setCashbackLastDate(cashbackLastDate);
@@ -208,6 +208,16 @@ public class AccountDaoImpl implements AccountDao {
             current.getLock().unlock();
         }
         throw new DaoConcurrencyException("Waiting lock");
+    }
+
+    private Double getValidAmount(Account current) {
+        double currentAmount;
+        if (current.getAmount() < 0) {
+            currentAmount = 0;
+        } else {
+            currentAmount = current.getAmount();
+        }
+        return currentAmount;
     }
 
     private void setAutoCommitTrue(Connection connection) {
