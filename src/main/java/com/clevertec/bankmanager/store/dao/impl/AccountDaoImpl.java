@@ -21,21 +21,41 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Implementation of DAO interface for process account objects.
+ * Using datasource for connect to the database.
+ */
 @RequiredArgsConstructor
 public class AccountDaoImpl implements AccountDao {
 
+    /** SELECT part of query with account parameters in the database. */
     private static final String SELECT_ACCOUNT = "SELECT a.id, a.number, a.amount, a.cashback_last_date, a.bank_id, a.user_id ";
+    /** FROM part of query with accounts table. */
     private static final String FROM_ACCOUNT = "FROM accounts a ";
+    /** INSERT query to create a new row in the database. */
     private static final String INSERT_ACCOUNT = "INSERT INTO accounts (number, amount, cashback_last_date, bank_id, user_id) VALUES (?, ?, ?, ?, ?)";
+    /** SELECT query to find account by ID */
     private static final String SELECT_ACCOUNT_BY_ID = SELECT_ACCOUNT + FROM_ACCOUNT + "WHERE a.id = ?";
+    /** SELECT query to get all accounts from the database */
     private static final String SELECT_ALL_ACCOUNTS = SELECT_ACCOUNT + FROM_ACCOUNT;
+    /** UPDATE query for set new values in fields of account entity. */
     private static final String UPDATE_ACCOUNT = "UPDATE accounts SET number = ?, amount = ?, cashback_last_date = ?, bank_id = ?, user_id = ? WHERE id = ? ";
+    /** DELETE query for delete account row by ID from the database. */
     private static final String DELETE_ACCOUNT = "DELETE FROM accounts a WHERE a.id = ?";
 
+    /** DataSource for create connection with database. */
     private final DataSource dataSource;
+    /** Used bank DAO for bank entity as part of account entity. */
     private final BankDao bankDao;
+    /** Used user DAO for user entity as part of account entity. */
     private final UserDao userDao;
 
+    /**
+     * Method for create new entity in database.
+     *
+     * @param account expected object of type Account to create it.
+     * @return new created Account object.
+     */
     @Override
     public Account create(Account account) {
         try (Connection connection = dataSource.getConnection()) {
@@ -58,6 +78,11 @@ public class AccountDaoImpl implements AccountDao {
         }
     }
 
+    /**
+     * Method for getting all account entities from database.
+     *
+     * @return List of Account objects.
+     */
     @Override
     public List<Account> getAll() {
         List<Account> accounts = new ArrayList<>();
@@ -73,6 +98,12 @@ public class AccountDaoImpl implements AccountDao {
         }
     }
 
+    /**
+     * Method find entity in database by ID.
+     *
+     * @param id expected object of type Long used as primary key.
+     * @return Account object.
+     */
     @Override
     public Account getById(Long id) {
         try (Connection connection = dataSource.getConnection()) {
@@ -89,6 +120,12 @@ public class AccountDaoImpl implements AccountDao {
         }
     }
 
+    /**
+     * Method update entity data in database.
+     *
+     * @param account expected updated object of type Account.
+     * @return updated Account object.
+     */
     @Override
     public Account update(Account account) {
         try (Connection connection = dataSource.getConnection()) {
@@ -106,6 +143,12 @@ public class AccountDaoImpl implements AccountDao {
         }
     }
 
+    /**
+     * Method delete row in database by ID.
+     *
+     * @param id expected object of type Long used as primary key.
+     * @return boolean value as result of deleted row.
+     */
     @Override
     public boolean delete(Long id) {
         try (Connection connection = dataSource.getConnection()) {
@@ -118,6 +161,13 @@ public class AccountDaoImpl implements AccountDao {
         }
     }
 
+    /**
+     * This method is used to deposit the amount to the account and update data in database.
+     *
+     * @param account expected the account to which the amount is deposited.
+     * @param value   expected amount to be credited to the account.
+     * @return updated Account object.
+     */
     @Override
     public Account deposit(Account account, Double value) {
         Account current = getById(account.getId());
@@ -135,6 +185,13 @@ public class AccountDaoImpl implements AccountDao {
         throw new DaoConcurrencyException("Waiting lock");
     }
 
+    /**
+     * This method is used to withdraw the amount from the account and update the data in database.
+     *
+     * @param account expected the account from which the amount will be withdrawn.
+     * @param value   expected amount to be debited from the account.
+     * @return updated account with new amount from database.
+     */
     @Override
     public Account withdraw(Account account, Double value) {
         Account current = getById(account.getId());
@@ -155,6 +212,14 @@ public class AccountDaoImpl implements AccountDao {
         throw new DaoConcurrencyException("Waiting lock");
     }
 
+    /**
+     * This method is used to make transactions to transfer the amount from one account to the second.
+     *
+     * @param senderAccount    expected the account who sent amount.
+     * @param recipientAccount expected the account who receive amount.
+     * @param value            expected transaction amount.
+     * @return new transaction object.
+     */
     @Override
     public Transaction transfer(Account senderAccount, Account recipientAccount, Double value) {
         Connection connection = null;
@@ -190,7 +255,14 @@ public class AccountDaoImpl implements AccountDao {
         throw new DaoConcurrencyException("Waiting lock");
     }
 
-
+    /**
+     * This method add a percent of amount on account.
+     *
+     * @param account          expected the account for cashback.
+     * @param cashbackLastDate expected the date for last cashback.
+     * @param percent          expected the percent of cashback.
+     * @return updated account with new amount from database.
+     */
     @Override
     public Account cashback(Account account, LocalDate cashbackLastDate, Double percent) {
         Account current = getById(account.getId());
@@ -210,6 +282,12 @@ public class AccountDaoImpl implements AccountDao {
         throw new DaoConcurrencyException("Waiting lock");
     }
 
+    /**
+     * Method check amount value of account for cashback.
+     *
+     * @param current expected Account object.
+     * @return Double value of amount.
+     */
     private Double getValidAmount(Account current) {
         double currentAmount;
         if (current.getAmount() < 0) {
@@ -220,6 +298,11 @@ public class AccountDaoImpl implements AccountDao {
         return currentAmount;
     }
 
+    /**
+     * Method for setting auto commit parameter true.
+     *
+     * @param connection expected used Connection object.
+     */
     private void setAutoCommitTrue(Connection connection) {
         try {
             if (connection != null) {
@@ -230,6 +313,13 @@ public class AccountDaoImpl implements AccountDao {
         }
     }
 
+    /**
+     * Method for processing Account object to create a new.
+     *
+     * @param result expected ResultSet object.
+     * @return new Account object.
+     * @throws SQLException default exception by using ResultSet methods.
+     */
     private Account processAccount(ResultSet result) throws SQLException {
         Account account = new Account();
         account.setId(result.getLong("id"));

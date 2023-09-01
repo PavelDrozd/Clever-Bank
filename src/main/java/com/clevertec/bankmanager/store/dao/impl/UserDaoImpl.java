@@ -14,19 +14,37 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation of DAO interface for process user objects.
+ * Using datasource for connect to the database.
+ */
 @RequiredArgsConstructor
 public class UserDaoImpl implements UserDao {
 
+    /** SELECT part of query with user parameters in the database. */
     private static final String SELECT_USER = "SELECT u.id, u.first_name, u.last_name ";
+    /** FROM part of query with users table. */
     private static final String FROM_USER = "FROM users u ";
+    /** INSERT query to create a new row in the database. */
     private static final String INSERT_USER = "INSERT INTO users (first_name, last_name) VALUES (?, ?)";
+    /** SELECT query to find user by ID */
     private static final String SELECT_USER_BY_ID = SELECT_USER + FROM_USER + "WHERE u.id = ?";
+    /** SELECT query to get all users from the database */
     private static final String SELECT_ALL_USERS = SELECT_USER + FROM_USER;
+    /** UPDATE query for set new values in fields of user entity. */
     private static final String UPDATE_USER = "UPDATE users SET first_name = ?, last_name = ? WHERE id = ? ";
+    /** DELETE query for delete user row by ID from the database. */
     private static final String DELETE_USER = "DELETE FROM users u WHERE u.id = ?";
 
+    /** DataSource for create connection with database. */
     private final DataSource dataSource;
 
+    /**
+     * Method for create new entity in database.
+     *
+     * @param user expected object of type User to create it.
+     * @return new created User object.
+     */
     @Override
     public User create(User user) {
         try (Connection connection = dataSource.getConnection()) {
@@ -46,6 +64,11 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
+    /**
+     * Method for getting all user entities from database.
+     *
+     * @return List of User objects.
+     */
     @Override
     public List<User> getAll() {
         List<User> users = new ArrayList<>();
@@ -61,6 +84,12 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
+    /**
+     * Method find entity in database by ID.
+     *
+     * @param id expected object of type Long used as primary key.
+     * @return User object.
+     */
     @Override
     public User getById(Long id) {
         try (Connection connection = dataSource.getConnection()) {
@@ -77,6 +106,12 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
+    /**
+     * Method update entity data in database.
+     *
+     * @param user expected updated object of type User.
+     * @return updated User object.
+     */
     @Override
     public User update(User user) {
         try (Connection connection = dataSource.getConnection()) {
@@ -91,6 +126,12 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
+    /**
+     * Method delete row in database by ID.
+     *
+     * @param id expected object of type Long used as primary key.
+     * @return boolean value as result of deleted row.
+     */
     @Override
     public boolean delete(Long id) {
         try (Connection connection = dataSource.getConnection()) {
@@ -103,6 +144,13 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
+    /**
+     * Method for processing User object to create a new.
+     *
+     * @param result expected ResultSet object.
+     * @return new User object.
+     * @throws SQLException default exception by using ResultSet methods.
+     */
     private User processUser(ResultSet result) throws SQLException {
         User user = new User();
         user.setId(result.getLong("id"));

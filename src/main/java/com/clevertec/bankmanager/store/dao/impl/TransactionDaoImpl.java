@@ -16,22 +16,41 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation of DAO interface for process transaction objects.
+ * Using datasource for connect to the database.
+ */
 @RequiredArgsConstructor
 public class TransactionDaoImpl implements TransactionDao {
 
+    /** SELECT part of query with transaction parameters in the database. */
     private static final String SELECT_TRANSACTION = "SELECT t.id, t.amount, t.date_time, t.recipient_id, t.sender_id ";
+    /** FROM part of query with transactions table. */
     private static final String FROM_TRANSACTION = "FROM transactions t ";
+    /** INSERT query to create a new row in the database. */
     private static final String INSERT_TRANSACTION =
             "INSERT INTO transactions (amount, date_time, recipient_id, sender_id) VALUES (?, ?, ?, ?)";
+    /** SELECT query to find transaction by ID */
     private static final String SELECT_TRANSACTION_BY_ID = SELECT_TRANSACTION + FROM_TRANSACTION + "WHERE t.id = ?";
+    /** SELECT query to get all transactions from the database */
     private static final String SELECT_ALL_TRANSACTIONS = SELECT_TRANSACTION + FROM_TRANSACTION;
+    /** UPDATE query for set new values in fields of transaction entity. */
     private static final String UPDATE_TRANSACTION =
             "UPDATE transactions SET amount = ?, date_time = ?, recipient_id = ?, sender_id = ? WHERE id = ? ";
+    /** DELETE query for delete transaction row by ID from the database. */
     private static final String DELETE_TRANSACTION = "DELETE FROM transactions t WHERE t.id = ?";
 
+    /** DataSource for create connection with database. */
     private final DataSource dataSource;
+    /** Used account DAO for account entity as part of transaction entity. */
     private final AccountDao accountDao;
 
+    /**
+     * Method for create new entity in database.
+     *
+     * @param transaction expected object of type Transaction to create it.
+     * @return new created Transaction object.
+     */
     @Override
     public Transaction create(Transaction transaction) {
         try (Connection connection = dataSource.getConnection()) {
@@ -53,6 +72,11 @@ public class TransactionDaoImpl implements TransactionDao {
         }
     }
 
+    /**
+     * Method for getting all transactions entities from database.
+     *
+     * @return List of Transaction objects.
+     */
     @Override
     public List<Transaction> getAll() {
         List<Transaction> transactions = new ArrayList<>();
@@ -68,6 +92,12 @@ public class TransactionDaoImpl implements TransactionDao {
         }
     }
 
+    /**
+     * Method find entity in database by ID.
+     *
+     * @param id expected object of type Long used as primary key.
+     * @return Transaction object.
+     */
     @Override
     public Transaction getById(Long id) {
         try (Connection connection = dataSource.getConnection()) {
@@ -84,6 +114,12 @@ public class TransactionDaoImpl implements TransactionDao {
         }
     }
 
+    /**
+     * Method update entity data in database.
+     *
+     * @param transaction expected updated object of type Transaction.
+     * @return updated Transaction object.
+     */
     @Override
     public Transaction update(Transaction transaction) {
         try (Connection connection = dataSource.getConnection()) {
@@ -100,6 +136,12 @@ public class TransactionDaoImpl implements TransactionDao {
         }
     }
 
+    /**
+     * Method delete row in database by ID.
+     *
+     * @param id expected object of type Long used as primary key.
+     * @return boolean value as result of deleted row.
+     */
     @Override
     public boolean delete(Long id) {
         try (Connection connection = dataSource.getConnection()) {
@@ -112,6 +154,13 @@ public class TransactionDaoImpl implements TransactionDao {
         }
     }
 
+    /**
+     * Method for processing Transaction object to create a new.
+     *
+     * @param result expected ResultSet object.
+     * @return new Transaction object.
+     * @throws SQLException default exception by using ResultSet methods.
+     */
     private Transaction processTransaction(ResultSet result) throws SQLException {
         Transaction transaction = new Transaction();
         transaction.setId(result.getLong("id"));

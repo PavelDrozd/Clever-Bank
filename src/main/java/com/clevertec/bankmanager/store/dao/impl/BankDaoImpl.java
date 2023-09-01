@@ -14,19 +14,37 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation of DAO interface for process bank objects.
+ * Using datasource for connect to the database.
+ */
 @RequiredArgsConstructor
 public class BankDaoImpl implements BankDao {
 
+    /** SELECT part of query with bank parameters in the database. */
     private static final String SELECT_BANK = "SELECT b.id, b.name ";
+    /** FROM part of query with banks table. */
     private static final String FROM_BANK = "FROM banks b ";
+    /** INSERT query to create a new row in the database. */
     private static final String INSERT_BANK = "INSERT INTO banks (name) VALUES (?)";
+    /** SELECT query to find bank by ID */
     private static final String SELECT_BANK_BY_ID = SELECT_BANK + FROM_BANK + "WHERE b.id = ?";
+    /** SELECT query to get all banks from the database */
     private static final String SELECT_ALL_BANKS = SELECT_BANK + FROM_BANK;
+    /** UPDATE query for set new values in fields of bank entity. */
     private static final String UPDATE_BANK = "UPDATE banks SET name = ? WHERE id = ? ";
+    /** DELETE query for delete bank row by ID from the database. */
     private static final String DELETE_BANK = "DELETE FROM banks b WHERE b.id = ?";
 
+    /** DataSource for create connection with database. */
     private final DataSource dataSource;
 
+    /**
+     * Method for create new entity in database.
+     *
+     * @param bank expected object of type Bank to create it.
+     * @return new created Bank object.
+     */
     @Override
     public Bank create(Bank bank) {
         try (Connection connection = dataSource.getConnection()) {
@@ -45,6 +63,11 @@ public class BankDaoImpl implements BankDao {
         }
     }
 
+    /**
+     * Method for getting all bank entities from database.
+     *
+     * @return List of Bank objects.
+     */
     @Override
     public List<Bank> getAll() {
         List<Bank> banks = new ArrayList<>();
@@ -60,6 +83,12 @@ public class BankDaoImpl implements BankDao {
         }
     }
 
+    /**
+     * Method find entity in database by ID.
+     *
+     * @param id expected object of type Long used as primary key.
+     * @return Bank object.
+     */
     @Override
     public Bank getById(Long id) {
         try (Connection connection = dataSource.getConnection()) {
@@ -76,6 +105,12 @@ public class BankDaoImpl implements BankDao {
         }
     }
 
+    /**
+     * Method update entity data in database.
+     *
+     * @param bank expected updated object of type Bank.
+     * @return updated Bank object.
+     */
     @Override
     public Bank update(Bank bank) {
         try (Connection connection = dataSource.getConnection()) {
@@ -89,6 +124,12 @@ public class BankDaoImpl implements BankDao {
         }
     }
 
+    /**
+     * Method delete row in database by ID.
+     *
+     * @param id expected object of type Long used as primary key.
+     * @return boolean value as result of deleted row.
+     */
     @Override
     public boolean delete(Long id) {
         try (Connection connection = dataSource.getConnection()) {
@@ -101,6 +142,13 @@ public class BankDaoImpl implements BankDao {
         }
     }
 
+    /**
+     * Method for processing Bank object to create a new.
+     *
+     * @param result expected ResultSet object.
+     * @return new Bank object.
+     * @throws SQLException default exception by using ResultSet methods.
+     */
     private Bank processBank(ResultSet result) throws SQLException {
         Bank bank = new Bank();
         bank.setId(result.getLong("id"));
