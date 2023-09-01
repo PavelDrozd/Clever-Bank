@@ -7,29 +7,29 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * This is entity class for account object in database
+ * This is entity class for account object in database.
  */
 @Data
 public class Account {
 
-    /** ID used as primary key in database */
+    /** ID used as primary key in database. */
     private Long id;
 
-    /** Account number */
+    /** Account number. */
     private Long number;
 
-    /** The amount of money on the account */
+    /** The amount of money on the account. */
     private Double amount;
 
-    /** The last date when the cashback was accrued */
+    /** The last date when the cashback was accrued. */
     private LocalDate cashbackLastDate;
 
-    /** Link to the bank that this account belongs to */
+    /** Link to the bank that this account belongs to. */
     private Bank bank;
 
-    /** Link to the user who uses this account */
+    /** Link to the user who uses this account. */
     private User user;
 
-    /** Lock is used for block this object to change the values of its fields */
+    /** Lock is used for block this object to change the values of its fields. */
     private Lock lock = new ReentrantLock();
 }

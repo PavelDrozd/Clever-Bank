@@ -8,12 +8,12 @@ import lombok.Data;
 @Data
 public class User {
 
-    /** ID used as primary key in database */
+    /** ID used as primary key in database. */
     private Long id;
 
-    /** User first name */
+    /** User first name. */
     private String firstName;
 
-    /** User last name */
+    /** User last name. */
     private String lastName;
 }

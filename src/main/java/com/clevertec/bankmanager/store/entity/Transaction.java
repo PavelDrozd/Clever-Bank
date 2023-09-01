@@ -10,18 +10,18 @@ import java.time.LocalDateTime;
 @Data
 public class Transaction {
 
-    /** ID used as primary key in database */
+    /** ID used as primary key in database. */
     private Long id;
 
-    /** Transaction amount */
+    /** Transaction amount. */
     private Double amount;
 
-    /** Date and time of the transaction */
+    /** Date and time of the transaction. */
     private LocalDateTime dateTime;
 
-    /** Link to the account of the recipient who receives the amount */
+    /** Link to the account of the recipient who receives the amount. */
     private Account recipientAccount;
 
-    /** Link to the account of the sender who sent the amount */
+    /** Link to the account of the sender who sent the amount. */
     private Account senderAccount;
 }
