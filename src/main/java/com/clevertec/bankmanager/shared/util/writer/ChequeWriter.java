@@ -12,16 +12,25 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
+/**
+ * Util class for write cheque
+ */
 public class ChequeWriter {
 
+    /** Resource bundle get messages for cheque from messages.properties. */
     private static final ResourceBundle message = ResourceBundle.getBundle("messages");
 
-    public static void writeCheck(TransactionDto transaction) {
-        LocalDateTime dateTime = transaction.getDateTime();
+    /**
+     * Write cheque with date, time, transaction information in source root in folder cheque.
+     *
+     * @param transactionDto expected object type of TransactionDto.
+     */
+    public static void writeCheque(TransactionDto transactionDto) {
+        LocalDateTime dateTime = transactionDto.getDateTime();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy_hh.mm.ss");
-        Path path = Paths.get("cheque/transaction" + dateTime.format(formatter) + ".txt");
+        Path path = Paths.get("cheque/transactionDto" + dateTime.format(formatter) + ".txt");
         checkDirectoryAndFile(path);
-        String text = formatText(transaction);
+        String text = formatText(transactionDto);
         try {
             Files.writeString(path, text, StandardCharsets.UTF_8);
         } catch (IOException e) {
@@ -29,6 +38,11 @@ public class ChequeWriter {
         }
     }
 
+    /**
+     * Checks for the presence of a file and folder at the specified path.
+     *
+     * @param path expected object type of Path.
+     */
     private static void checkDirectoryAndFile(Path path) {
         try {
             Files.createDirectory(path.getParent());
@@ -39,7 +53,13 @@ public class ChequeWriter {
         }
     }
 
-    private static String formatText(TransactionDto transaction) {
+    /**
+     * Formats the text for printing the transaction receipt.
+     *
+     * @param transactionDto expected object type of TransactionDto.
+     * @return String formatted text for printing the receipt.
+     */
+    private static String formatText(TransactionDto transactionDto) {
         String msgBankCheque = message.getString("msg.cheque.bank_cheque");
         String msgCheque = message.getString("msg.cheque.cheque");
         String msgBankSender = message.getString("msg.cheque.bank_sender");
@@ -55,11 +75,11 @@ public class ChequeWriter {
         String date = now.toLocalDate().format(dateFormat);
         String time = now.toLocalTime().format(timeFormat);
 
-        String senderBank = transaction.getSenderAccount().getBank().getName();
-        String recipientBank = transaction.getRecipientAccount().getBank().getName();
-        Long senderAccountNumber = transaction.getSenderAccount().getNumber();
-        Long recipientAccountNumber = transaction.getRecipientAccount().getNumber();
-        Double amount = transaction.getAmount();
+        String senderBank = transactionDto.getSenderAccount().getBank().getName();
+        String recipientBank = transactionDto.getRecipientAccount().getBank().getName();
+        Long senderAccountNumber = transactionDto.getSenderAccount().getNumber();
+        Long recipientAccountNumber = transactionDto.getRecipientAccount().getNumber();
+        Double amount = transactionDto.getAmount();
         return String.format("""
                         _________________________________________
                         |\t\t\t%14s\t\t\t\t|
@@ -72,7 +92,7 @@ public class ChequeWriter {
                         | %5s:\t\t\t%15.2f BYN |
                         |_______________________________________|
                         """,
-                msgBankCheque, msgCheque, transaction.getId(), date, time, msgBankSender, senderBank, msgBankRecipient,
+                msgBankCheque, msgCheque, transactionDto.getId(), date, time, msgBankSender, senderBank, msgBankRecipient,
                 recipientBank, msgAccountSender, senderAccountNumber, msgAccountRecipient, recipientAccountNumber,
                 msgAmount, amount);
     }
