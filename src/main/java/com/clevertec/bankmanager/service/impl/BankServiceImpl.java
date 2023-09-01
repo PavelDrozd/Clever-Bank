@@ -12,16 +12,30 @@ import com.clevertec.bankmanager.store.entity.Bank;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of service interface for process bank DTO objects.
+ */
 public class BankServiceImpl implements BankService {
 
+    /** BankDao is used to get objects from DAO module. */
     private final BankDao bankDao;
+    /** Mapper for mapping DTO and entity objects. */
     private final EntityDtoMapper mapper;
 
+    /**
+     * This constructor use BankDao implementation and set instance of mapper from EntityDtoMapper.
+     * @param accountDao expected BankDao implementation class.
+     */
     public BankServiceImpl(BankDao bankDao) {
         this.bankDao = bankDao;
         mapper = EntityDtoMapper.getInstance();
     }
 
+    /**
+     * Method for create new DTO class and transfer it to database by using DAO.
+     * @param bankDto expected object of type BankDto to create it.
+     * @return new created BankDto object.
+     */
     @Override
     public BankDto create(BankDto bankDto) {
         try {
@@ -32,6 +46,10 @@ public class BankServiceImpl implements BankService {
         }
     }
 
+    /**
+     * Method for getting all bank DTO objects from DAO.
+     * @return List of BankDto objects.
+     */
     @Override
     public List<BankDto> getAll() {
         try {
@@ -41,6 +59,11 @@ public class BankServiceImpl implements BankService {
         }
     }
 
+    /**
+     * Method get bank DTO object from DAO by ID.
+     * @param id expected object of type Long used as primary key.
+     * @return BankDto object.
+     */
     @Override
     public BankDto getById(Long id) {
         try {
@@ -53,6 +76,11 @@ public class BankServiceImpl implements BankService {
         }
     }
 
+    /**
+     * Method update bank DTO in database by using DAO.
+     * @param bankDto expected updated object of type BankDto.
+     * @return updated BankDto object.
+     */
     @Override
     public BankDto update(BankDto bankDto) {
         try {
@@ -63,6 +91,10 @@ public class BankServiceImpl implements BankService {
         }
     }
 
+    /**
+     * Method delete object by using DAO by ID.
+     * @param id expected object of type Long used as primary key.
+     */
     @Override
     public void delete(Long id) {
         try {

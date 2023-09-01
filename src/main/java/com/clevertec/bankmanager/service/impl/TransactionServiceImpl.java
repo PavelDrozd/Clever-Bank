@@ -16,31 +16,54 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of service interface for process transaction DTO objects.
+ */
 public class TransactionServiceImpl implements TransactionService {
 
+    /** TransactionDao is used to get objects from DAO module. */
     private final TransactionDao transactionDao;
+    /** AccountDao is used to get objects from DAO module. */
     private final AccountDao accountDao;
+    /** Mapper for mapping DTO and entity objects. */
     private final EntityDtoMapper mapper;
 
+    /**
+     * This constructor use TransactionDao, AccountDao implementation and set instance of mapper from EntityDtoMapper.
+     *
+     * @param transactionDao expected TransactionDao implementation class.
+     * @param accountDao     expected AccountDao implementation class.
+     */
     public TransactionServiceImpl(TransactionDao transactionDao, AccountDao accountDao) {
         this.transactionDao = transactionDao;
         this.accountDao = accountDao;
         this.mapper = EntityDtoMapper.getInstance();
     }
 
+    /**
+     * Method for create new DTO class and transfer it to database by using DAO.
+     *
+     * @param transactionDto expected object of type TransactionDto to create it.
+     * @return new created TransactionDto object.
+     */
     @Override
     public TransactionDto create(TransactionDto transactionDto) {
         try {
             transactionDto.setDateTime(LocalDateTime.now());
             Transaction transaction = transactionDao.create(mapper.mapToTransaction(transactionDto));
             TransactionDto created = mapper.mapToTransactionDto(transaction);
-            ChequeWriter.writeCheck(created);
+            ChequeWriter.writeCheque(created);
             return created;
         } catch (DaoException e) {
             throw new ServiceException(e);
         }
     }
 
+    /**
+     * Method for getting all transaction DTO objects from DAO.
+     *
+     * @return List of TransactionDto objects.
+     */
     @Override
     public List<TransactionDto> getAll() {
         try {
@@ -50,6 +73,12 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
+    /**
+     * Method get transaction DTO object from DAO by ID.
+     *
+     * @param id expected object of type Long used as primary key.
+     * @return TransactionDto object.
+     */
     @Override
     public TransactionDto getById(Long id) {
         try {
@@ -62,18 +91,29 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
+    /**
+     * Method update transaction DTO in database by using DAO.
+     *
+     * @param transactionDto expected updated object of type TransactionDto.
+     * @return updated TransactionDto object.
+     */
     @Override
     public TransactionDto update(TransactionDto transactionDto) {
         try {
             Transaction transaction = transactionDao.update(mapper.mapToTransaction(transactionDto));
             TransactionDto updated = mapper.mapToTransactionDto(transaction);
-            ChequeWriter.writeCheck(updated);
+            ChequeWriter.writeCheque(updated);
             return updated;
         } catch (DaoException e) {
             throw new ServiceException(e);
         }
     }
 
+    /**
+     * Method delete object by using DAO by ID.
+     *
+     * @param id expected object of type Long used as primary key.
+     */
     @Override
     public void delete(Long id) {
         try {
@@ -85,6 +125,14 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
+    /**
+     * This method is used to make transactions to transfer the amount from one account to the second.
+     *
+     * @param senderAccount    expected the AccountDto who sent amount.
+     * @param recipientAccount expected the AccountDto who receive amount.
+     * @param value            expected transaction amount.
+     * @return new TransactionDto object.
+     */
     @Override
     public TransactionDto transfer(AccountDto senderAccount, AccountDto recipientAccount, Double value) {
         try {

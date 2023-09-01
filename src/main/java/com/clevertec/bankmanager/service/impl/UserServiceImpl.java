@@ -12,16 +12,32 @@ import com.clevertec.bankmanager.store.entity.User;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of service interface for process user DTO objects.
+ */
 public class UserServiceImpl implements UserService {
 
+    /** UserDao is used to get objects from DAO module. */
     private final UserDao userDao;
+    /** Mapper for mapping DTO and entity objects. */
     private final EntityDtoMapper mapper;
 
+    /**
+     * This constructor use UserDao implementation and set instance of mapper from EntityDtoMapper.
+     *
+     * @param userDao expected UserDao implementation class.
+     */
     public UserServiceImpl(UserDao userDao) {
         this.userDao = userDao;
         mapper = EntityDtoMapper.getInstance();
     }
 
+    /**
+     * Method for create new DTO class and transfer it to database by using DAO.
+     *
+     * @param userDto expected object of type UserDto to create it.
+     * @return new created UserDto object.
+     */
     @Override
     public UserDto create(UserDto userDto) {
         try {
@@ -32,6 +48,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * Method for getting all user DTO objects from DAO.
+     *
+     * @return List of UserDto objects.
+     */
     @Override
     public List<UserDto> getAll() {
         try {
@@ -41,6 +62,12 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * Method get user DTO object from DAO by ID.
+     *
+     * @param id expected object of type Long used as primary key.
+     * @return UserDto object.
+     */
     @Override
     public UserDto getById(Long id) {
         try {
@@ -53,6 +80,12 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * Method update user DTO in database by using DAO.
+     *
+     * @param userDto expected updated object of type UserDto.
+     * @return updated userDto object.
+     */
     @Override
     public UserDto update(UserDto userDto) {
         try {
@@ -63,6 +96,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * Method delete object by using DAO by ID.
+     *
+     * @param id expected object of type Long used as primary key.
+     */
     @Override
     public void delete(Long id) {
         try {
