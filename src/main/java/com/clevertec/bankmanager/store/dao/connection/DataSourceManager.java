@@ -7,20 +7,40 @@ import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 
+/**
+ * This class allows to create connection with database.
+ * DataSourceManager use singleton pattern with eager initialization.
+ */
 public class DataSourceManager {
 
-    public final static DataSourceManager INSTANCE = new DataSourceManager();
+    /** Initialize instance of DataSourceManager class once */
+    public static final DataSourceManager INSTANCE = new DataSourceManager();
+
+    /** Driver property in configuration file. */
     private static final String DB_DRIVER = "database.driver";
+    /** Url property in configuration file. */
     private static final String DB_URL = "database.url";
+    /** User property in configuration file. */
     private static final String DB_USER = "database.user";
+    /** Password property in configuration file. */
     private static final String DB_PASSWORD = "database.password";
+    /** Min pool size property in configuration file. */
     private static final String DB_MIN_POOL = "database.min";
+    /** Max pool size property in configuration file. */
     private static final String DB_MAX_POOL = "database.max";
+    /** Auto commit property in configuration file. */
     private static final String DB_AUTO_COMMIT = "database.autocommit";
+    /** Timeout property in configuration file. */
     private static final String DB_LOGIN_TIMEOUT = "database.timeout";
+
+    /** HikariDataSource used as main DataSource class. */
     private final HikariDataSource dataSource;
+    /** Get instance of ConfigurationYamlManager for using yaml properties. */
     private final ConfigurationYamlManager yaml = ConfigurationYamlManager.INSTANCE;
 
+    /**
+     * Private constructor initialize HikariDataSource and set properties in it by yaml configuration.
+     */
     private DataSourceManager() {
         try {
             dataSource = new HikariDataSource();
@@ -37,11 +57,13 @@ public class DataSourceManager {
         }
     }
 
+    /** Public method for get instance of DataSource. */
     public DataSource getDataSource() {
         return dataSource;
     }
 
-    public void close(){
+    /** Public method for close data source. */
+    public void close() {
         dataSource.close();
     }
 }
