@@ -35,13 +35,13 @@ public class AccountDaoImpl implements AccountDao {
     /** INSERT query to create a new row in the database. */
     private static final String INSERT_ACCOUNT = "INSERT INTO accounts (number, amount, cashback_last_date, bank_id, user_id) VALUES (?, ?, ?, ?, ?)";
     /** SELECT query to find account by ID */
-    private static final String SELECT_ACCOUNT_BY_ID = SELECT_ACCOUNT + FROM_ACCOUNT + "WHERE a.id = ?";
+    private static final String SELECT_ACCOUNT_BY_ID = SELECT_ACCOUNT + FROM_ACCOUNT + "WHERE a.id = ? AND a.deleted = false";
     /** SELECT query to get all accounts from the database */
-    private static final String SELECT_ALL_ACCOUNTS = SELECT_ACCOUNT + FROM_ACCOUNT;
+    private static final String SELECT_ALL_ACCOUNTS = SELECT_ACCOUNT + FROM_ACCOUNT + "WHERE a.deleted = false";
     /** UPDATE query for set new values in fields of account entity. */
-    private static final String UPDATE_ACCOUNT = "UPDATE accounts SET number = ?, amount = ?, cashback_last_date = ?, bank_id = ?, user_id = ? WHERE id = ? ";
-    /** DELETE query for delete account row by ID from the database. */
-    private static final String DELETE_ACCOUNT = "DELETE FROM accounts a WHERE a.id = ?";
+    private static final String UPDATE_ACCOUNT = "UPDATE accounts SET number = ?, amount = ?, cashback_last_date = ?, bank_id = ?, user_id = ? WHERE id = ? AND deleted = false";
+    /** DELETE query by set deleted value true in account row by ID from the database. */
+    private static final String DELETE_ACCOUNT = "UPDATE accounts a SET  deleted = true WHERE a.id = ?";
 
     /** DataSource for create connection with database. */
     private final DataSource dataSource;

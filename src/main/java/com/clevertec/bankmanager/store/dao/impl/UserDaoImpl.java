@@ -28,13 +28,14 @@ public class UserDaoImpl implements UserDao {
     /** INSERT query to create a new row in the database. */
     private static final String INSERT_USER = "INSERT INTO users (first_name, last_name) VALUES (?, ?)";
     /** SELECT query to find user by ID */
-    private static final String SELECT_USER_BY_ID = SELECT_USER + FROM_USER + "WHERE u.id = ?";
+    private static final String SELECT_USER_BY_ID = SELECT_USER + FROM_USER + "WHERE u.id = ? AND u.deleted = false";
     /** SELECT query to get all users from the database */
-    private static final String SELECT_ALL_USERS = SELECT_USER + FROM_USER;
+    private static final String SELECT_ALL_USERS = SELECT_USER + FROM_USER + "WHERE u.deleted = false";
     /** UPDATE query for set new values in fields of user entity. */
-    private static final String UPDATE_USER = "UPDATE users SET first_name = ?, last_name = ? WHERE id = ? ";
-    /** DELETE query for delete user row by ID from the database. */
-    private static final String DELETE_USER = "DELETE FROM users u WHERE u.id = ?";
+    private static final String UPDATE_USER = "UPDATE users SET first_name = ?, last_name = ? " +
+                                              "WHERE id = ? AND deleted = false";
+    /** DELETE query by set deleted value true in user row by ID from the database. */
+    private static final String DELETE_USER = "UPDATE users u SET deleted = true WHERE u.id = ?";
 
     /** DataSource for create connection with database. */
     private final DataSource dataSource;

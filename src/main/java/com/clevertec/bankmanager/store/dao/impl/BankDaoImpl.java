@@ -28,13 +28,13 @@ public class BankDaoImpl implements BankDao {
     /** INSERT query to create a new row in the database. */
     private static final String INSERT_BANK = "INSERT INTO banks (name) VALUES (?)";
     /** SELECT query to find bank by ID */
-    private static final String SELECT_BANK_BY_ID = SELECT_BANK + FROM_BANK + "WHERE b.id = ?";
+    private static final String SELECT_BANK_BY_ID = SELECT_BANK + FROM_BANK + "WHERE b.id = ? AND b.deleted = false";
     /** SELECT query to get all banks from the database */
-    private static final String SELECT_ALL_BANKS = SELECT_BANK + FROM_BANK;
+    private static final String SELECT_ALL_BANKS = SELECT_BANK + FROM_BANK + "WHERE b.deleted = false";
     /** UPDATE query for set new values in fields of bank entity. */
-    private static final String UPDATE_BANK = "UPDATE banks SET name = ? WHERE id = ? ";
-    /** DELETE query for delete bank row by ID from the database. */
-    private static final String DELETE_BANK = "DELETE FROM banks b WHERE b.id = ?";
+    private static final String UPDATE_BANK = "UPDATE banks SET name = ? WHERE id = ? AND deleted = false";
+    /** DELETE query by set deleted value true in bank row by ID from the database. */
+    private static final String DELETE_BANK = "UPDATE banks b SET deleted = true WHERE b.id = ?";
 
     /** DataSource for create connection with database. */
     private final DataSource dataSource;

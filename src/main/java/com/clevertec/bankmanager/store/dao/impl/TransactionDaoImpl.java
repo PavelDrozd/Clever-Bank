@@ -31,14 +31,17 @@ public class TransactionDaoImpl implements TransactionDao {
     private static final String INSERT_TRANSACTION =
             "INSERT INTO transactions (amount, date_time, recipient_id, sender_id) VALUES (?, ?, ?, ?)";
     /** SELECT query to find transaction by ID */
-    private static final String SELECT_TRANSACTION_BY_ID = SELECT_TRANSACTION + FROM_TRANSACTION + "WHERE t.id = ?";
+    private static final String SELECT_TRANSACTION_BY_ID = SELECT_TRANSACTION + FROM_TRANSACTION +
+                                                           "WHERE t.id = ? AND t.deleted = false";
     /** SELECT query to get all transactions from the database */
-    private static final String SELECT_ALL_TRANSACTIONS = SELECT_TRANSACTION + FROM_TRANSACTION;
+    private static final String SELECT_ALL_TRANSACTIONS = SELECT_TRANSACTION + FROM_TRANSACTION +
+                                                          "WHERE t.deleted = false";
     /** UPDATE query for set new values in fields of transaction entity. */
     private static final String UPDATE_TRANSACTION =
-            "UPDATE transactions SET amount = ?, date_time = ?, recipient_id = ?, sender_id = ? WHERE id = ? ";
-    /** DELETE query for delete transaction row by ID from the database. */
-    private static final String DELETE_TRANSACTION = "DELETE FROM transactions t WHERE t.id = ?";
+            "UPDATE transactions SET amount = ?, date_time = ?, recipient_id = ?, sender_id = ? " +
+            "WHERE id = ? AND deleted = false";
+    /** DELETE query by set deleted value true in transaction row by ID from the database. */
+    private static final String DELETE_TRANSACTION = "UPDATE transactions t SET deleted = true WHERE t.id = ?";
 
     /** DataSource for create connection with database. */
     private final DataSource dataSource;
