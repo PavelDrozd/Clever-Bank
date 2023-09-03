@@ -1,18 +1,19 @@
-<configuration>
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration debug="true">
     <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
+        <Console name="HIKARI" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%logger{1}] - %msg%n"/>
         </Console>
+        <appender name="LOG" class="ch.qos.logback.core.ConsoleAppender">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%logger{1}] - %msg%n"/>
+        </appender>
     </Appenders>
     <Loggers>
         <Logger name="com.zaxxer.hikari.HikariConfig" level="debug" additivity="true">
-            <AppenderRef ref="Console"/>
+            <AppenderRef ref="HIKARI"/>
         </Logger>
-        <Logger name="com.company" level="debug">
-            <AppenderRef ref= "Console"/>
+        <Logger name="com.baeldung.logback" level="trace">
+            <AppenderRef ref="LOG"/>
         </Logger>
-        <Root level="trace">
-            <AppenderRef ref="Console"/>
-        </Root>
     </Loggers>
-</configuration>
+</Configuration>
