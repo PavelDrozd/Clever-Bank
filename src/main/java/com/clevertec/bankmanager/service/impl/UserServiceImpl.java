@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(Long id) {
         try {
-            if (userDao.delete(id)) {
+            if (!userDao.delete(id)) {
                 throw new ServiceValidationException("Can't delete user by id: " + id);
             }
         } catch (DaoException e) {

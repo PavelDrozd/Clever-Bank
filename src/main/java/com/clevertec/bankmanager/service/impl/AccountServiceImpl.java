@@ -104,7 +104,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void delete(Long id) {
         try {
-            if (accountDao.delete(id)) {
+            if (!accountDao.delete(id)) {
                 throw new ServiceValidationException("Can't delete account by id: " + id);
             }
         } catch (DaoException e) {

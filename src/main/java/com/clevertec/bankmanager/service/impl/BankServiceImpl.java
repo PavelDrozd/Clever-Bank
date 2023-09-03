@@ -98,7 +98,7 @@ public class BankServiceImpl implements BankService {
     @Override
     public void delete(Long id) {
         try {
-            if (bankDao.delete(id)) {
+            if (!bankDao.delete(id)) {
                 throw new ServiceValidationException("Can't delete bank by id: " + id);
             }
         } catch (DaoException e) {

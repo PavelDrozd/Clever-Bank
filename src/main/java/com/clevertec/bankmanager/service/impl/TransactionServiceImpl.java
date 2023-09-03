@@ -117,7 +117,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public void delete(Long id) {
         try {
-            if (transactionDao.delete(id)) {
+            if (!transactionDao.delete(id)) {
                 throw new ServiceValidationException("Can't delete bank by id: " + id);
             }
         } catch (DaoException e) {
