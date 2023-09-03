@@ -9,6 +9,7 @@ import com.clevertec.bankmanager.store.dao.UserDao;
 import com.clevertec.bankmanager.store.entity.Account;
 import com.clevertec.bankmanager.store.entity.Transaction;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -26,6 +27,7 @@ import java.util.concurrent.TimeUnit;
  * Using datasource for connect to the database.
  */
 @RequiredArgsConstructor
+@Slf4j
 public class AccountDaoImpl implements AccountDao {
 
     /** SELECT part of query with account parameters in the database. */
@@ -58,6 +60,7 @@ public class AccountDaoImpl implements AccountDao {
      */
     @Override
     public Account create(Account account) {
+        log.debug("DAO CREATE ACCOUNT: " + account);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(//
                     INSERT_ACCOUNT, Statement.RETURN_GENERATED_KEYS);
@@ -74,6 +77,7 @@ public class AccountDaoImpl implements AccountDao {
             }
             return created;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - CREATE ACCOUNT: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -85,6 +89,7 @@ public class AccountDaoImpl implements AccountDao {
      */
     @Override
     public List<Account> getAll() {
+        log.debug("DAO GET ALL ACCOUNTS ");
         List<Account> accounts = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SELECT_ALL_ACCOUNTS);
@@ -94,6 +99,7 @@ public class AccountDaoImpl implements AccountDao {
             }
             return accounts;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - GET ALL ACCOUNTS: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -106,6 +112,7 @@ public class AccountDaoImpl implements AccountDao {
      */
     @Override
     public Account getById(Long id) {
+        log.debug("DAO GET ACCOUNT BY ID: " + id);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SELECT_ACCOUNT_BY_ID);
             statement.setLong(1, id);
@@ -116,6 +123,7 @@ public class AccountDaoImpl implements AccountDao {
             }
             return account;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - GET ACCOUNT BY ID: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -128,6 +136,7 @@ public class AccountDaoImpl implements AccountDao {
      */
     @Override
     public Account update(Account account) {
+        log.debug("DAO UPDATE ACCOUNT: " + account);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(UPDATE_ACCOUNT);
             statement.setLong(1, account.getNumber());
@@ -139,6 +148,7 @@ public class AccountDaoImpl implements AccountDao {
             statement.executeUpdate();
             return getById(account.getId());
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - UPDATE ACCOUNT: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -151,12 +161,14 @@ public class AccountDaoImpl implements AccountDao {
      */
     @Override
     public boolean delete(Long id) {
+        log.debug("DAO DELETE ACCOUNT BY ID: " + id);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(DELETE_ACCOUNT);
             statement.setLong(1, id);
             int rowDeleted = statement.executeUpdate();
             return rowDeleted == 1;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - DELETE ACCOUNT BY ID: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -170,6 +182,7 @@ public class AccountDaoImpl implements AccountDao {
      */
     @Override
     public Account deposit(Account account, Double value) {
+        log.debug("DAO ACCOUNT DEPOSIT: " + account + " VALUE: " + value);
         Account current = getById(account.getId());
         try {
             if (current.getLock().tryLock(10, TimeUnit.SECONDS)) {
@@ -178,10 +191,12 @@ public class AccountDaoImpl implements AccountDao {
                 return update(current);
             }
         } catch (InterruptedException e) {
+            log.error("DAO EXCEPTION - ACCOUNT DEPOSIT: " + e.getMessage());
             throw new DaoException(e);
         } finally {
             current.getLock().unlock();
         }
+        log.error("DAO EXCEPTION - WAITING LOCK");
         throw new DaoConcurrencyException("Waiting lock");
     }
 
@@ -194,6 +209,7 @@ public class AccountDaoImpl implements AccountDao {
      */
     @Override
     public Account withdraw(Account account, Double value) {
+        log.debug("DAO ACCOUNT WITHDRAW: " + account + " VALUE: " + value);
         Account current = getById(account.getId());
         try {
             if (current.getLock().tryLock(10, TimeUnit.SECONDS)) {
@@ -205,10 +221,12 @@ public class AccountDaoImpl implements AccountDao {
                 return update(current);
             }
         } catch (InterruptedException e) {
+            log.error("DAO EXCEPTION - ACCOUNT WITHDRAW: " + e.getMessage());
             throw new DaoException(e);
         } finally {
             current.getLock().unlock();
         }
+        log.error("DAO EXCEPTION - WAITING LOCK");
         throw new DaoConcurrencyException("Waiting lock");
     }
 
@@ -222,6 +240,7 @@ public class AccountDaoImpl implements AccountDao {
      */
     @Override
     public Transaction transfer(Account senderAccount, Account recipientAccount, Double value) {
+        log.debug("DAO TRANSFER FROM: " + senderAccount + " TO: " + recipientAccount + "VALUE: " + value);
         Connection connection = null;
         try {
             connection = dataSource.getConnection();
@@ -240,18 +259,22 @@ public class AccountDaoImpl implements AccountDao {
                         }
                     }
                 } catch (InterruptedException e) {
+                    log.error("DAO EXCEPTION - CONCURRENCY DURING TRANSFER: " + e.getMessage());
                     throw new DaoConcurrencyException(e);
                 } finally {
                     senderAccount.getLock().unlock();
                 }
             }
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - TRANSFER: " + e.getMessage());
             throw new DaoException(e);
         } catch (InterruptedException e) {
+            log.error("DAO EXCEPTION - CONCURRENCY DURING TRANSFER: " + e.getMessage());
             throw new DaoConcurrencyException(e);
         } finally {
             setAutoCommitTrue(connection);
         }
+        log.error("DAO EXCEPTION - WAITING LOCK");
         throw new DaoConcurrencyException("Waiting lock");
     }
 
@@ -265,6 +288,7 @@ public class AccountDaoImpl implements AccountDao {
      */
     @Override
     public Account cashback(Account account, LocalDate cashbackLastDate, Double percent) {
+        log.debug("DAO CASHBACK ACCOUNT: " + account);
         Account current = getById(account.getId());
         try {
             if (current.getLock().tryLock(10, TimeUnit.SECONDS)) {
@@ -275,10 +299,12 @@ public class AccountDaoImpl implements AccountDao {
                 return update(current);
             }
         } catch (InterruptedException e) {
+            log.error("DAO EXCEPTION - CONCURRENCY DURING CASHBACK: " + e.getMessage());
             throw new DaoConcurrencyException(e);
         } finally {
             current.getLock().unlock();
         }
+        log.error("DAO EXCEPTION - WAITING LOCK");
         throw new DaoConcurrencyException("Waiting lock");
     }
 

@@ -4,6 +4,7 @@ import com.clevertec.bankmanager.shared.exception.store.dao.DaoException;
 import com.clevertec.bankmanager.store.dao.BankDao;
 import com.clevertec.bankmanager.store.entity.Bank;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -19,6 +20,7 @@ import java.util.List;
  * Using datasource for connect to the database.
  */
 @RequiredArgsConstructor
+@Slf4j
 public class BankDaoImpl implements BankDao {
 
     /** SELECT part of query with bank parameters in the database. */
@@ -47,6 +49,7 @@ public class BankDaoImpl implements BankDao {
      */
     @Override
     public Bank create(Bank bank) {
+        log.debug("DAO CREATE BANK: " + bank);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(//
                     INSERT_BANK, Statement.RETURN_GENERATED_KEYS);
@@ -59,6 +62,7 @@ public class BankDaoImpl implements BankDao {
             }
             return created;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - CREATE BANK: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -70,6 +74,7 @@ public class BankDaoImpl implements BankDao {
      */
     @Override
     public List<Bank> getAll() {
+        log.debug("DAO GET ALL BANKS ");
         List<Bank> banks = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SELECT_ALL_BANKS);
@@ -79,6 +84,7 @@ public class BankDaoImpl implements BankDao {
             }
             return banks;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - GET ALL BANKS: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -91,6 +97,7 @@ public class BankDaoImpl implements BankDao {
      */
     @Override
     public Bank getById(Long id) {
+        log.debug("DAO GET BANK BY ID: " + id);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SELECT_BANK_BY_ID);
             statement.setLong(1, id);
@@ -101,6 +108,7 @@ public class BankDaoImpl implements BankDao {
             }
             return bank;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - GET BANK BY ID: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -113,6 +121,7 @@ public class BankDaoImpl implements BankDao {
      */
     @Override
     public Bank update(Bank bank) {
+        log.debug("DAO UPDATE BANK: " + bank);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(UPDATE_BANK);
             statement.setString(1, bank.getName());
@@ -120,6 +129,7 @@ public class BankDaoImpl implements BankDao {
             statement.executeUpdate();
             return getById(bank.getId());
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - UPDATE BANK: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -132,12 +142,14 @@ public class BankDaoImpl implements BankDao {
      */
     @Override
     public boolean delete(Long id) {
+        log.debug("DAO DELETE BANK BY ID: " + id);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(DELETE_BANK);
             statement.setLong(1, id);
             int rowDeleted = statement.executeUpdate();
             return rowDeleted == 1;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - DELETE BANK BY ID: " + e.getMessage());
             throw new DaoException(e);
         }
     }

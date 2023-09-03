@@ -2,6 +2,7 @@ package com.clevertec.bankmanager.shared.util.writer;
 
 import com.clevertec.bankmanager.data.dto.TransactionDto;
 import com.clevertec.bankmanager.shared.exception.service.ServiceIOException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -16,6 +17,7 @@ import java.util.ResourceBundle;
 /**
  * Util class for write cheque.
  */
+@Slf4j
 public class ChequeWriter {
 
     /** Resource bundle get messages for cheque from messages.properties. */
@@ -35,6 +37,7 @@ public class ChequeWriter {
         try {
             Files.writeString(path, text, StandardCharsets.UTF_8);
         } catch (IOException e) {
+            log.error("CHEQUE WRITER - SERVICE IO EXCEPTION: " + e.getMessage());
             throw new ServiceIOException(e);
         }
     }
@@ -48,8 +51,10 @@ public class ChequeWriter {
         try {
             Files.createDirectory(path.getParent());
             Files.createFile(path);
-        } catch (FileAlreadyExistsException ignored) {
+        } catch (FileAlreadyExistsException e) {
+            log.debug("CHEQUE WRITER - (IGNORED) FILE ALREADY EXISTS EXCEPTION " + e.getMessage());
         } catch (IOException e) {
+            log.error("CHEQUE WRITER - SERVICE IO EXCEPTION: " + e.getMessage());
             throw new ServiceIOException(e);
         }
     }

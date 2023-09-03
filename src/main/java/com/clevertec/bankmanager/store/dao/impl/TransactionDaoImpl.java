@@ -5,6 +5,7 @@ import com.clevertec.bankmanager.store.dao.AccountDao;
 import com.clevertec.bankmanager.store.dao.TransactionDao;
 import com.clevertec.bankmanager.store.entity.Transaction;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -21,6 +22,7 @@ import java.util.List;
  * Using datasource for connect to the database.
  */
 @RequiredArgsConstructor
+@Slf4j
 public class TransactionDaoImpl implements TransactionDao {
 
     /** SELECT part of query with transaction parameters in the database. */
@@ -56,6 +58,7 @@ public class TransactionDaoImpl implements TransactionDao {
      */
     @Override
     public Transaction create(Transaction transaction) {
+        log.debug("DAO CREATE TRANSACTION: " + transaction);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(//
                     INSERT_TRANSACTION, Statement.RETURN_GENERATED_KEYS);
@@ -71,6 +74,7 @@ public class TransactionDaoImpl implements TransactionDao {
             }
             return created;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - CREATE TRANSACTION: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -82,6 +86,7 @@ public class TransactionDaoImpl implements TransactionDao {
      */
     @Override
     public List<Transaction> getAll() {
+        log.debug("DAO GET ALL TRANSACTIONS");
         List<Transaction> transactions = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SELECT_ALL_TRANSACTIONS);
@@ -91,6 +96,7 @@ public class TransactionDaoImpl implements TransactionDao {
             }
             return transactions;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - GET ALL TRANSACTIONS: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -103,6 +109,7 @@ public class TransactionDaoImpl implements TransactionDao {
      */
     @Override
     public Transaction getById(Long id) {
+        log.debug("DAO GET TRANSACTION BY ID: " + id);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SELECT_TRANSACTION_BY_ID);
             statement.setLong(1, id);
@@ -113,6 +120,7 @@ public class TransactionDaoImpl implements TransactionDao {
             }
             return transaction;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - GET TRANSACTION BY ID: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -125,6 +133,7 @@ public class TransactionDaoImpl implements TransactionDao {
      */
     @Override
     public Transaction update(Transaction transaction) {
+        log.debug("DAO UPDATE TRANSACTION: " + transaction);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(UPDATE_TRANSACTION);
             statement.setDouble(1, transaction.getAmount());
@@ -135,6 +144,7 @@ public class TransactionDaoImpl implements TransactionDao {
             statement.executeUpdate();
             return getById(transaction.getId());
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - UPDATE TRANSACTION: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -147,12 +157,14 @@ public class TransactionDaoImpl implements TransactionDao {
      */
     @Override
     public boolean delete(Long id) {
+        log.debug("DAO DELETE TRANSACTION BY ID: " + id);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(DELETE_TRANSACTION);
             statement.setLong(1, id);
             int rowDeleted = statement.executeUpdate();
             return rowDeleted == 1;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - DELETE TRANSACTION BY ID: " + e.getMessage());
             throw new DaoException(e);
         }
     }

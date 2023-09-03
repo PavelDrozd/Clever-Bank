@@ -4,6 +4,7 @@ import com.clevertec.bankmanager.shared.exception.store.dao.DaoException;
 import com.clevertec.bankmanager.store.dao.UserDao;
 import com.clevertec.bankmanager.store.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -19,6 +20,7 @@ import java.util.List;
  * Using datasource for connect to the database.
  */
 @RequiredArgsConstructor
+@Slf4j
 public class UserDaoImpl implements UserDao {
 
     /** SELECT part of query with user parameters in the database. */
@@ -48,6 +50,7 @@ public class UserDaoImpl implements UserDao {
      */
     @Override
     public User create(User user) {
+        log.debug("DAO CREATE USER: " + user);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(//
                     INSERT_USER, Statement.RETURN_GENERATED_KEYS);
@@ -61,6 +64,7 @@ public class UserDaoImpl implements UserDao {
             }
             return created;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - CREATE USER: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -72,6 +76,7 @@ public class UserDaoImpl implements UserDao {
      */
     @Override
     public List<User> getAll() {
+        log.debug("DAO GET ALL USERS");
         List<User> users = new ArrayList<>();
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SELECT_ALL_USERS);
@@ -81,6 +86,7 @@ public class UserDaoImpl implements UserDao {
             }
             return users;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - GET ALL USERS: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -93,6 +99,7 @@ public class UserDaoImpl implements UserDao {
      */
     @Override
     public User getById(Long id) {
+        log.debug("DAO GET USER BY ID: " + id);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(SELECT_USER_BY_ID);
             statement.setLong(1, id);
@@ -103,6 +110,7 @@ public class UserDaoImpl implements UserDao {
             }
             return user;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - GET USER BY ID: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -115,6 +123,7 @@ public class UserDaoImpl implements UserDao {
      */
     @Override
     public User update(User user) {
+        log.debug("DAO UPDATE USER: " + user);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(UPDATE_USER);
             statement.setString(1, user.getFirstName());
@@ -123,6 +132,7 @@ public class UserDaoImpl implements UserDao {
             statement.executeUpdate();
             return getById(user.getId());
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - UPDATE USER: " + e.getMessage());
             throw new DaoException(e);
         }
     }
@@ -135,12 +145,14 @@ public class UserDaoImpl implements UserDao {
      */
     @Override
     public boolean delete(Long id) {
+        log.debug("DAO DELETE USER BY ID: " + id);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(DELETE_USER);
             statement.setLong(1, id);
             int rowDeleted = statement.executeUpdate();
             return rowDeleted == 1;
         } catch (SQLException e) {
+            log.error("DAO EXCEPTION - DELETE USER: " + e.getMessage());
             throw new DaoException(e);
         }
     }

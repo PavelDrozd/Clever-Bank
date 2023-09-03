@@ -8,6 +8,7 @@ import com.clevertec.bankmanager.shared.exception.store.dao.DaoException;
 import com.clevertec.bankmanager.shared.util.mapper.EntityDtoMapper;
 import com.clevertec.bankmanager.store.dao.UserDao;
 import com.clevertec.bankmanager.store.entity.User;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 /**
  * Implementation of service interface for process user DTO objects.
  */
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     /** UserDao is used to get objects from DAO module. */
@@ -40,10 +42,12 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserDto create(UserDto userDto) {
+        log.debug("SERVICE CREATE USER: " + userDto);
         try {
             User user = userDao.create(mapper.mapToUser(userDto));
             return mapper.mapToUserDto(user);
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - CREATE USER: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
@@ -55,9 +59,11 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public List<UserDto> getAll() {
+        log.debug("SERVICE GET ALL USERS ");
         try {
             return userDao.getAll().stream().map(mapper::mapToUserDto).collect(Collectors.toList());
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - GET ALL USERS: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
@@ -70,12 +76,15 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserDto getById(Long id) {
+        log.debug("SERVICE GET USER BY ID: " + id);
         try {
             if (userDao.getById(id) == null) {
+                log.error("SERVICE VALIDATION EXCEPTION - GET USER BY ID ");
                 throw new ServiceValidationException("User with ID:" + id + " is null.");
             }
             return mapper.mapToUserDto(userDao.getById(id));
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - GET USER BY ID: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
@@ -88,10 +97,12 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserDto update(UserDto userDto) {
+        log.debug("SERVICE UPDATE USER: " + userDto);
         try {
             User user = userDao.update(mapper.mapToUser(userDto));
             return mapper.mapToUserDto(user);
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - UPDATE USER: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
@@ -103,11 +114,14 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void delete(Long id) {
+        log.debug("SERVICE DELETE USER BY ID: " + id);
         try {
             if (!userDao.delete(id)) {
+                log.error("SERVICE VALIDATION EXCEPTION - DELETE USER ");
                 throw new ServiceValidationException("Can't delete user by id: " + id);
             }
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - DELETE USER BY ID: " + e.getMessage());
             throw new ServiceException(e);
         }
     }

@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 
 /**
  * RestController used for processing http methods and send response.
@@ -43,6 +42,7 @@ public class RestController extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+        log.debug("CONTROLLER METHOD DO GET");
         process(req, resp);
     }
 
@@ -58,6 +58,7 @@ public class RestController extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+        log.debug("CONTROLLER METHOD DO POST");
         process(req, resp);
     }
 
@@ -73,6 +74,7 @@ public class RestController extends HttpServlet {
      */
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
+        log.debug("CONTROLLER METHOD DO PUT");
         process(req, resp);
     }
 
@@ -88,15 +90,16 @@ public class RestController extends HttpServlet {
      */
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
+        log.debug("CONTROLLER METHOD DO DELETE");
         process(req, resp);
     }
 
     /** Servlet destroy method close CashbackScheduleExecutorService and DataSource. */
     @Override
     public void destroy() {
-        log.info("SERVLET DESTROY");
         CashbackScheduleExecutorService.getInstance().shutdown();
         DataSourceManager.INSTANCE.close();
+        log.info("SERVLET DESTROYED");
     }
 
     /**
@@ -114,7 +117,7 @@ public class RestController extends HttpServlet {
             RestCommand commandInstance = processRequest(req);
             sendResponse(req, resp, commandInstance);
         } catch (Exception e) {
-            log.error(e.toString());
+            log.error("CONTROLLER EXCEPTION " + e.getMessage());
             toErrorPage(req, resp, e);
         }
     }
@@ -128,10 +131,9 @@ public class RestController extends HttpServlet {
      * @return commandInstance of RestCommand.
      */
     private RestCommand processRequest(HttpServletRequest req) {
-        String command1 = req.getParameter("command");
         String[] pathInfo = req.getPathInfo().split("/");
-        log.info(Arrays.toString(pathInfo));
         String command = pathInfo[1];
+        log.debug("CONTROLLER COMMAND: " + command);
         checkPathInfo(pathInfo);
         RestCommand commandInstance = RestCommandFactory.INSTANCE.getCommand(command);
         checkCommandInstance(commandInstance);
@@ -145,6 +147,7 @@ public class RestController extends HttpServlet {
      */
     private void checkPathInfo(String[] pathInfo) {
         if (pathInfo[1] == null) {
+            log.error("CONTROLLER INVALID COMMAND EXCEPTION: INVALID LINK");
             throw new ControllerInvalidCommandException("Invalid link");
         }
     }
@@ -156,6 +159,7 @@ public class RestController extends HttpServlet {
      */
     private void checkCommandInstance(RestCommand commandInstance) {
         if (commandInstance == null) {
+            log.error("CONTROLLER INVALID COMMAND EXCEPTION: INVALID COMMAND");
             throw new ControllerInvalidCommandException("Invalid command");
         }
     }
@@ -173,7 +177,6 @@ public class RestController extends HttpServlet {
      */
     private void sendResponse(HttpServletRequest req, HttpServletResponse resp, RestCommand commandInstance) {
         String jsonObject = commandInstance.execute(req);
-        log.info(jsonObject);
         resp.setContentType("application/json");
         resp.setStatus((int) req.getAttribute("status"));
         writeResponse(resp, jsonObject);
@@ -192,6 +195,7 @@ public class RestController extends HttpServlet {
         try {
             out = resp.getWriter();
         } catch (IOException e) {
+            log.error("CONTROLLER IO EXCEPTION: " + e.getMessage());
             throw new ControllerIOException(e);
         }
         out.print(jsonObject);
@@ -220,7 +224,7 @@ public class RestController extends HttpServlet {
             out.print(gson.toJson(error));
             out.flush();
         } catch (IOException ex) {
-            log.error("Something went wrong...", ex);
+            log.error("CONTROLLER IO EXCEPTION: " + ex.getMessage());
             throw new ControllerException(ex);
         }
     }

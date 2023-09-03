@@ -22,6 +22,7 @@ public class DataInputStreamReader {
             }
             return sb.toString();
         } catch (IOException e) {
+            log.error("DATA INPUT STREAM READER - SERVICE IO EXCEPTION: " + e.getMessage());
             throw new ServiceIOException(e);
         } finally {
             closeInputStream(is);
@@ -32,7 +33,7 @@ public class DataInputStreamReader {
         try {
             is.close();
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error("DATA INPUT STREAM READER - CAN NOT CLOSE INPUT STREAM: " + e.getMessage());
         }
     }
 }

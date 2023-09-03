@@ -10,6 +10,7 @@ import com.clevertec.bankmanager.shared.util.writer.ChequeWriter;
 import com.clevertec.bankmanager.store.dao.AccountDao;
 import com.clevertec.bankmanager.store.dao.TransactionDao;
 import com.clevertec.bankmanager.store.entity.Transaction;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 /**
  * Implementation of service interface for process transaction DTO objects.
  */
+@Slf4j
 public class TransactionServiceImpl implements TransactionService {
 
     /** TransactionDao is used to get objects from DAO module. */
@@ -47,6 +49,7 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     public TransactionDto create(TransactionDto transactionDto) {
+        log.debug("SERVICE CREATE TRANSACTION: " + transactionDto);
         try {
             transactionDto.setDateTime(LocalDateTime.now());
             Transaction transaction = transactionDao.create(mapper.mapToTransaction(transactionDto));
@@ -54,6 +57,7 @@ public class TransactionServiceImpl implements TransactionService {
             ChequeWriter.writeCheque(created);
             return created;
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - CREATE USER: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
@@ -65,9 +69,11 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     public List<TransactionDto> getAll() {
+        log.debug("SERVICE GET ALL TRANSACTIONS ");
         try {
             return transactionDao.getAll().stream().map(mapper::mapToTransactionDto).collect(Collectors.toList());
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - GET ALL USERS: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
@@ -80,12 +86,15 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     public TransactionDto getById(Long id) {
+        log.debug("SERVICE GET TRANSACTION BY ID: " + id);
         try {
             if (transactionDao.getById(id) == null) {
+                log.error("SERVICE VALIDATION EXCEPTION - CREATE USER ");
                 throw new ServiceValidationException("Transaction with ID:" + id + " is null.");
             }
             return mapper.mapToTransactionDto(transactionDao.getById(id));
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - GET USER BY ID: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
@@ -98,12 +107,14 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     public TransactionDto update(TransactionDto transactionDto) {
+        log.debug("SERVICE UPDATE TRANSACTION: " + transactionDto);
         try {
             Transaction transaction = transactionDao.update(mapper.mapToTransaction(transactionDto));
             TransactionDto updated = mapper.mapToTransactionDto(transaction);
             ChequeWriter.writeCheque(updated);
             return updated;
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - CREATE USER: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
@@ -115,11 +126,14 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     public void delete(Long id) {
+        log.debug("SERVICE DELETE TRANSACTION BY ID: " + id);
         try {
             if (!transactionDao.delete(id)) {
-                throw new ServiceValidationException("Can't delete bank by id: " + id);
+                log.error("SERVICE VALIDATION EXCEPTION - DELETE TRANSACTION BY ID ");
+                throw new ServiceValidationException("Can't delete transaction by id: " + id);
             }
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - DELETE TRANSACTION BY ID: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
@@ -134,11 +148,13 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     public TransactionDto transfer(Long senderAccountId, Long recipientAccountId, Double value) {
+        log.debug("SERVICE TRANSFER FROM ID: " + senderAccountId + " TO ID: " + recipientAccountId + " VALUE " + value);
         try {
             Transaction transaction = accountDao.transfer(
                     accountDao.getById(senderAccountId), accountDao.getById(recipientAccountId), value);
             return create(mapper.mapToTransactionDto(transaction));
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - TRANSFER: " + e.getMessage());
             throw new ServiceException("The transfer for the amount of " + value + " was canceled by reason: " + e);
         }
     }

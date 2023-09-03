@@ -5,6 +5,7 @@ import com.clevertec.bankmanager.service.CashbackAccountService;
 import com.clevertec.bankmanager.store.dao.AccountDao;
 import com.clevertec.bankmanager.store.entity.Account;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
  * Implementation of service interface for process cashback in accounts.
  */
 @RequiredArgsConstructor
+@Slf4j
 public class CashbackAccountServiceImpl implements CashbackAccountService {
 
     /** AccountDao is used to get objects from DAO module. */
@@ -34,6 +36,7 @@ public class CashbackAccountServiceImpl implements CashbackAccountService {
      */
     @Override
     public void run() {
+        log.trace("SERVICE CASHBACK ");
         LocalDate dateNow = LocalDate.now();
         List<Account> accounts = accountDao.getAll();
         for (Account account : accounts) {

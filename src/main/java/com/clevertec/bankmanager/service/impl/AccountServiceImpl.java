@@ -8,6 +8,7 @@ import com.clevertec.bankmanager.shared.exception.store.dao.DaoException;
 import com.clevertec.bankmanager.shared.util.mapper.EntityDtoMapper;
 import com.clevertec.bankmanager.store.dao.AccountDao;
 import com.clevertec.bankmanager.store.entity.Account;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 /**
  * Implementation of service interface for process account DTO objects.
  */
+@Slf4j
 public class AccountServiceImpl implements AccountService {
 
     /** AccountDao is used to get objects from DAO module. */
@@ -40,10 +42,12 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public AccountDto create(AccountDto accountDto) {
+        log.debug("SERVICE CREATE ACCOUNT: " + accountDto);
         try {
             Account account = accountDao.create(mapper.mapToAccount(accountDto));
             return mapper.mapToAccountDto(account);
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - CREATE ACCOUNT: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
@@ -55,9 +59,11 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public List<AccountDto> getAll() {
+        log.debug("SERVICE GET ALL ACCOUNTS: ");
         try {
             return accountDao.getAll().stream().map(mapper::mapToAccountDto).collect(Collectors.toList());
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - GET ALL ACCOUNTS: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
@@ -70,12 +76,15 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public AccountDto getById(Long id) {
+        log.debug("SERVICE GET ACCOUNT BY ID: " + id);
         try {
             if (accountDao.getById(id) == null) {
+                log.error("SERVICE VALIDATION EXCEPTION - GET ACCOUNT BY ID ");
                 throw new ServiceValidationException("Account with ID:" + id + " is null.");
             }
             return mapper.mapToAccountDto(accountDao.getById(id));
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - GET ACCOUNT BY ID: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
@@ -88,10 +97,12 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public AccountDto update(AccountDto accountDto) {
+        log.debug("SERVICE UPDATE ACCOUNT: " + accountDto);
         try {
             Account account = accountDao.update(mapper.mapToAccount(accountDto));
             return mapper.mapToAccountDto(account);
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - UPDATE ACCOUNT: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
@@ -103,11 +114,14 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public void delete(Long id) {
+        log.debug("SERVICE DELETE ACCOUNT BY ID: " + id);
         try {
             if (!accountDao.delete(id)) {
+                log.error("SERVICE VALIDATION EXCEPTION - DELETE ACCOUNT ");
                 throw new ServiceValidationException("Can't delete account by id: " + id);
             }
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - DELETE ACCOUNT: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
@@ -121,10 +135,12 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public AccountDto deposit(Long id, Double value) {
+        log.debug("SERVICE ACCOUNT ID DEPOSIT: " + id + " VALUE: " + value);
         try {
             Account account = accountDao.deposit(accountDao.getById(id), value);
             return mapper.mapToAccountDto(account);
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - ACCOUNT DEPOSIT: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
@@ -138,10 +154,12 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public AccountDto withdraw(Long id, Double value) {
+        log.debug("SERVICE ACCOUNT ID WITHDRAW: " + id + " VALUE: " + value);
         try {
             Account account = accountDao.withdraw(accountDao.getById(id), value);
             return mapper.mapToAccountDto(account);
         } catch (DaoException e) {
+            log.error("SERVICE EXCEPTION - ACCOUNT WITHDRAW: " + e.getMessage());
             throw new ServiceException(e);
         }
     }
