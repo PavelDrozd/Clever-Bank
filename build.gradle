@@ -1,9 +1,10 @@
 plugins {
     id 'java'
+    id 'war'
 }
 
 group = 'com.clevertec'
-version = '1.0-SNAPSHOT'
+version = '1.0'
 
 configurations {
     compileOnly {
@@ -23,7 +24,17 @@ dependencies {
     implementation 'org.yaml:snakeyaml:2.1'
     implementation 'org.slf4j:slf4j-api:2.0.7'
     implementation 'org.slf4j:slf4j-simple:2.0.7'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'javax.servlet:javax.servlet-api:4.0.1'
 
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
+}
+
+war {
+    archiveFileName = 'bankmanager.war'
+    webAppDirectory = file('src/main/webapp')
+    from 'src/main/webapp'
+    webInf { from 'src/main/webapp/WEB-INF' }
+
 }

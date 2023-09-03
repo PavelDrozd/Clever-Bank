@@ -11,4 +11,4 @@ cashback:
   delay: 0
   period: 30
   percent: 1
-  test: true
+  test: false
