@@ -46,7 +46,7 @@ public class RestUpdateAccountCommand implements RestCommand {
      * @param req expected HttpServletRequest.
      * @return String value of JSON.
      */
-    private static String readJson(HttpServletRequest req) {
+    private String readJson(HttpServletRequest req) {
         String json;
         try {
             json = DataInputStreamReader.getString(req.getInputStream());
