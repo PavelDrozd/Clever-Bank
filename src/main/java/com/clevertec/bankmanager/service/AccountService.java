@@ -16,7 +16,7 @@ public interface AccountService extends AbstractService<Long, AccountDto> {
      * @param value      expected amount to be credited to the account DTO class.
      * @return updated accountDto with new amount from DAO.
      */
-    AccountDto deposit(AccountDto accountDto, Double value);
+    AccountDto deposit(Long id, Double value);
 
     /**
      * This method is used to withdraw the amount from the account.
@@ -25,5 +25,5 @@ public interface AccountService extends AbstractService<Long, AccountDto> {
      * @param value      expected amount to be debited from the account DTO class.
      * @return updated accountDto with new amount from DAO.
      */
-    AccountDto withdraw(AccountDto accountDto, Double value);
+    AccountDto withdraw(Long id, Double value);
 }

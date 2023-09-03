@@ -1,6 +1,5 @@
 package com.clevertec.bankmanager.service.impl;
 
-import com.clevertec.bankmanager.data.dto.AccountDto;
 import com.clevertec.bankmanager.data.dto.TransactionDto;
 import com.clevertec.bankmanager.service.TransactionService;
 import com.clevertec.bankmanager.shared.exception.service.ServiceException;
@@ -128,16 +127,16 @@ public class TransactionServiceImpl implements TransactionService {
     /**
      * This method is used to make transactions to transfer the amount from one account to the second.
      *
-     * @param senderAccount    expected the AccountDto who sent amount.
-     * @param recipientAccount expected the AccountDto who receive amount.
-     * @param value            expected transaction amount.
+     * @param senderAccountId    expected Long account id who sent amount.
+     * @param recipientAccountId expected Long account id who receive amount.
+     * @param value              expected transaction amount.
      * @return new TransactionDto object.
      */
     @Override
-    public TransactionDto transfer(AccountDto senderAccount, AccountDto recipientAccount, Double value) {
+    public TransactionDto transfer(Long senderAccountId, Long recipientAccountId, Double value) {
         try {
             Transaction transaction = accountDao.transfer(
-                    mapper.mapToAccount(senderAccount), mapper.mapToAccount(recipientAccount), value);
+                    accountDao.getById(senderAccountId), accountDao.getById(recipientAccountId), value);
             return create(mapper.mapToTransactionDto(transaction));
         } catch (DaoException e) {
             throw new ServiceException("The transfer for the amount of " + value + " was canceled by reason: " + e);

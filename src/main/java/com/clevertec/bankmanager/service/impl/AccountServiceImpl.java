@@ -115,14 +115,14 @@ public class AccountServiceImpl implements AccountService {
     /**
      * This method is used to deposit the amount to the account and update data in database by DAO.
      *
-     * @param accountDto expected the account to which the amount is deposited.
-     * @param value      expected amount to be credited to the account.
+     * @param id    expected account id to which the amount is deposited.
+     * @param value expected amount to be credited to the account.
      * @return updated AccountDto object.
      */
     @Override
-    public AccountDto deposit(AccountDto accountDto, Double value) {
+    public AccountDto deposit(Long id, Double value) {
         try {
-            Account account = accountDao.deposit(mapper.mapToAccount(accountDto), value);
+            Account account = accountDao.deposit(accountDao.getById(id), value);
             return mapper.mapToAccountDto(account);
         } catch (DaoException e) {
             throw new ServiceException(e);
@@ -132,14 +132,14 @@ public class AccountServiceImpl implements AccountService {
     /**
      * This method is used to withdraw the amount from the account and update the data in database by DAO.
      *
-     * @param account expected the account from which the amount will be withdrawn.
-     * @param value   expected amount to be debited from the account.
+     * @param id    expected account id from which the amount will be withdrawn.
+     * @param value expected amount to be debited from the account.
      * @return updated AccountDto object.
      */
     @Override
-    public AccountDto withdraw(AccountDto accountDto, Double value) {
+    public AccountDto withdraw(Long id, Double value) {
         try {
-            Account account = accountDao.withdraw(mapper.mapToAccount(accountDto), value);
+            Account account = accountDao.withdraw(accountDao.getById(id), value);
             return mapper.mapToAccountDto(account);
         } catch (DaoException e) {
             throw new ServiceException(e);
