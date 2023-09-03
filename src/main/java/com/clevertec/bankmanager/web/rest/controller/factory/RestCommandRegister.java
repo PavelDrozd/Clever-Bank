@@ -11,7 +11,9 @@ import com.clevertec.bankmanager.web.rest.controller.commands.account.RestAccoun
 import com.clevertec.bankmanager.web.rest.controller.commands.account.RestAccountsCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.account.RestCreateAccountCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.account.RestDeleteAccountCommand;
+import com.clevertec.bankmanager.web.rest.controller.commands.account.RestDepositCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.account.RestUpdateAccountCommand;
+import com.clevertec.bankmanager.web.rest.controller.commands.account.RestWithdrawCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.bank.RestBankCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.bank.RestBanksCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.bank.RestCreateBankCommand;
@@ -21,6 +23,7 @@ import com.clevertec.bankmanager.web.rest.controller.commands.transaction.RestCr
 import com.clevertec.bankmanager.web.rest.controller.commands.transaction.RestDeleteTransactionCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.transaction.RestTransactionCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.transaction.RestTransactionsCommand;
+import com.clevertec.bankmanager.web.rest.controller.commands.transaction.RestTransferCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.transaction.RestUpdateTransactionCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.user.RestCreateUserCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.user.RestDeleteUserCommand;
@@ -46,6 +49,8 @@ public enum RestCommandRegister {
     CREATE_ACCOUNT(new RestCreateAccountCommand(ServiceFactory.INSTANCE.getService(AccountService.class))),
     UPDATE_ACCOUNT(new RestUpdateAccountCommand(ServiceFactory.INSTANCE.getService(AccountService.class))),
     DELETE_ACCOUNT(new RestDeleteAccountCommand(ServiceFactory.INSTANCE.getService(AccountService.class))),
+    DEPOSIT(new RestDepositCommand(ServiceFactory.INSTANCE.getService(AccountService.class))),
+    WITHDRAW(new RestWithdrawCommand(ServiceFactory.INSTANCE.getService(AccountService.class))),
 
     //BANK COMMANDS
     BANK(new RestBankCommand(ServiceFactory.INSTANCE.getService(BankService.class))),
@@ -60,6 +65,7 @@ public enum RestCommandRegister {
     CREATE_TRANSACTION(new RestCreateTransactionCommand(ServiceFactory.INSTANCE.getService(TransactionService.class))),
     UPDATE_TRANSACTION(new RestUpdateTransactionCommand(ServiceFactory.INSTANCE.getService(TransactionService.class))),
     DELETE_TRANSACTION(new RestDeleteTransactionCommand(ServiceFactory.INSTANCE.getService(TransactionService.class))),
+    TRANSFER(new RestTransferCommand(ServiceFactory.INSTANCE.getService(TransactionService.class))),
 
     //USER COMMANDS
     USER(new RestUserCommand(ServiceFactory.INSTANCE.getService(UserService.class))),
