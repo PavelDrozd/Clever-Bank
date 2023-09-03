@@ -1,6 +1,7 @@
 package com.clevertec.bankmanager.shared.util.writer;
 
 import com.clevertec.bankmanager.data.dto.TransactionDto;
+import com.clevertec.bankmanager.shared.exception.service.ServiceIOException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -13,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 /**
- * Util class for write cheque
+ * Util class for write cheque.
  */
 public class ChequeWriter {
 
@@ -34,7 +35,7 @@ public class ChequeWriter {
         try {
             Files.writeString(path, text, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ServiceIOException(e);
         }
     }
 
@@ -49,7 +50,7 @@ public class ChequeWriter {
             Files.createFile(path);
         } catch (FileAlreadyExistsException ignored) {
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ServiceIOException(e);
         }
     }
 
@@ -69,7 +70,7 @@ public class ChequeWriter {
         String msgAmount = message.getString("msg.cheque.amount");
         String msgCurrency = message.getString("msg.cheque.currency");
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = transactionDto.getDateTime();
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("hh:mm:ss");
         String date = now.toLocalDate().format(dateFormat);
