@@ -2,13 +2,16 @@ package com.clevertec.bankmanager.web.rest.controller.commands.account;
 
 import com.clevertec.bankmanager.data.dto.MessageDto;
 import com.clevertec.bankmanager.service.AccountService;
-import com.clevertec.bankmanager.shared.exception.web.controller.ControllerIllegalArgumentException;
+import com.clevertec.bankmanager.shared.exception.web.controller.ControllerIOException;
 import com.clevertec.bankmanager.shared.util.mapper.GsonMapper;
+import com.clevertec.bankmanager.shared.util.reader.DataInputStreamReader;
 import com.clevertec.bankmanager.web.rest.controller.commands.RestCommand;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 /**
  * This class is an implementation of RestCommand interface for
@@ -30,7 +33,8 @@ public class RestDeleteAccountCommand implements RestCommand {
      */
     @Override
     public String execute(HttpServletRequest req) {
-        Long id = getValidParameter(req.getParameter("id"));
+        JsonObject jsonId = readJsonObject(req);
+        Long id = jsonId.getAsJsonPrimitive("id").getAsLong();
         accountService.delete(id);
         req.setAttribute("status", 204);
         MessageDto message = new MessageDto();
@@ -40,15 +44,20 @@ public class RestDeleteAccountCommand implements RestCommand {
     }
 
     /**
-     * Method check String parameter and parse it to Long
+     * Method read account from HttpServletRequest.
      *
-     * @param parameter expected String value.
-     * @return Long number of parameter.
+     * @param req expected HttpServletRequest.
+     * @return object type of JsonObject.
      */
-    private Long getValidParameter(String parameter) {
-        if (parameter == null || parameter.isEmpty() || parameter.matches("\\D")) {
-            throw new ControllerIllegalArgumentException("Required parameter is not valid");
+    private JsonObject readJsonObject(HttpServletRequest req) {
+        String json;
+        JsonObject jsonObject;
+        try {
+            json = DataInputStreamReader.getString(req.getInputStream());
+            jsonObject = gson.fromJson(json, JsonObject.class);
+        } catch (IOException e) {
+            throw new ControllerIOException(e);
         }
-        return Long.parseLong(parameter);
+        return jsonObject;
     }
 }

@@ -11,6 +11,7 @@ import com.clevertec.bankmanager.store.entity.Account;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +45,9 @@ public class AccountServiceImpl implements AccountService {
     public AccountDto create(AccountDto accountDto) {
         log.debug("SERVICE CREATE ACCOUNT: " + accountDto);
         try {
+            Random random = new Random();
+            long randomNumber = (long) (random.nextDouble() * 9_000_000_000_000L) + 1_000_000_000_000L;
+            accountDto.setNumber(randomNumber);
             Account account = accountDao.create(mapper.mapToAccount(accountDto));
             return mapper.mapToAccountDto(account);
         } catch (DaoException e) {

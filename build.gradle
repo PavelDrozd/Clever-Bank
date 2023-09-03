@@ -33,7 +33,7 @@ dependencies {
 }
 
 war {
-    archiveFileName = 'bankmanager.war'
+    archiveFileName = 'clever.war'
     webAppDirectory = file('src/main/webapp')
     from 'src/main/webapp'
     webInf { from 'src/main/webapp/WEB-INF' }

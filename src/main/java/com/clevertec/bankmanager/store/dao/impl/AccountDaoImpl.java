@@ -35,7 +35,7 @@ public class AccountDaoImpl implements AccountDao {
     /** FROM part of query with accounts table. */
     private static final String FROM_ACCOUNT = "FROM accounts a ";
     /** INSERT query to create a new row in the database. */
-    private static final String INSERT_ACCOUNT = "INSERT INTO accounts (number, amount, cashback_last_date, bank_id, user_id) VALUES (?, ?, ?, ?, ?)";
+    private static final String INSERT_ACCOUNT = "INSERT INTO accounts (number, bank_id, user_id) VALUES ( ?, ?, ?)";
     /** SELECT query to find account by ID */
     private static final String SELECT_ACCOUNT_BY_ID = SELECT_ACCOUNT + FROM_ACCOUNT + "WHERE a.id = ? AND a.deleted = false";
     /** SELECT query to get all accounts from the database */
@@ -65,10 +65,8 @@ public class AccountDaoImpl implements AccountDao {
             PreparedStatement statement = connection.prepareStatement(//
                     INSERT_ACCOUNT, Statement.RETURN_GENERATED_KEYS);
             statement.setLong(1, account.getNumber());
-            statement.setDouble(2, account.getAmount());
-            statement.setObject(3, account.getCashbackLastDate());
-            statement.setLong(4, account.getBank().getId());
-            statement.setLong(5, account.getUser().getId());
+            statement.setLong(2, account.getBank().getId());
+            statement.setLong(3, account.getUser().getId());
             statement.executeUpdate();
             ResultSet key = statement.getGeneratedKeys();
             Account created = new Account();

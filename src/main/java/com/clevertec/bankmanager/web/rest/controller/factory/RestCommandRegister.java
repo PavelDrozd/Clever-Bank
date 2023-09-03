@@ -18,6 +18,7 @@ import com.clevertec.bankmanager.web.rest.controller.commands.bank.RestBankComma
 import com.clevertec.bankmanager.web.rest.controller.commands.bank.RestBanksCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.bank.RestCreateBankCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.bank.RestDeleteBankCommand;
+import com.clevertec.bankmanager.web.rest.controller.commands.bank.RestUpdateBankCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.error.RestErrorCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.transaction.RestCreateTransactionCommand;
 import com.clevertec.bankmanager.web.rest.controller.commands.transaction.RestDeleteTransactionCommand;
@@ -56,7 +57,7 @@ public enum RestCommandRegister {
     BANK(new RestBankCommand(ServiceFactory.INSTANCE.getService(BankService.class))),
     BANKS(new RestBanksCommand(ServiceFactory.INSTANCE.getService(BankService.class))),
     CREATE_BANK(new RestCreateBankCommand(ServiceFactory.INSTANCE.getService(BankService.class))),
-    UPDATE_BANK(new RestCreateBankCommand(ServiceFactory.INSTANCE.getService(BankService.class))),
+    UPDATE_BANK(new RestUpdateBankCommand(ServiceFactory.INSTANCE.getService(BankService.class))),
     DELETE_BANK(new RestDeleteBankCommand(ServiceFactory.INSTANCE.getService(BankService.class))),
 
     //TRANSACTION COMMANDS
