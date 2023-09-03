@@ -9,12 +9,10 @@ import java.sql.SQLException;
 
 /**
  * This class allows to create connection with database.
- * DataSourceManager use singleton pattern with eager initialization.
+ * Enum values are available globally, and used as a singleton.
  */
-public class DataSourceManager {
-
-    /** Initialize instance of DataSourceManager class once */
-    public static final DataSourceManager INSTANCE = new DataSourceManager();
+public enum DataSourceManager {
+    INSTANCE;
 
     /** Driver property in configuration file. */
     private static final String DB_DRIVER = "database.driver";
@@ -39,9 +37,9 @@ public class DataSourceManager {
     private final ConfigurationYamlManager yaml = ConfigurationYamlManager.INSTANCE;
 
     /**
-     * Private constructor initialize HikariDataSource and set properties in it by yaml configuration.
+     * Constructor initialize HikariDataSource and set properties in it by yaml configuration.
      */
-    private DataSourceManager() {
+    DataSourceManager() {
         try {
             dataSource = new HikariDataSource();
             dataSource.setDriverClassName(yaml.getProperty(DB_DRIVER));
