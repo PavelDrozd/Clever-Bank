@@ -1,6 +1,7 @@
 package com.clevertec.bankmanager.store.entity;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.concurrent.locks.Lock;
@@ -31,5 +32,6 @@ public class Account {
     private User user;
 
     /** Lock is used for block this object to change the values of its fields. */
-    private Lock lock = new ReentrantLock();
+    @ToString.Exclude
+    protected Lock lock = new ReentrantLock();
 }

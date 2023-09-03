@@ -1,6 +1,5 @@
 package com.clevertec.bankmanager.data.dto;
 
-import com.clevertec.bankmanager.store.entity.Account;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -21,8 +20,8 @@ public class TransactionDto {
     private LocalDateTime dateTime;
 
     /** Link to the account of the recipient who receives the amount. */
-    private Account recipientAccount;
+    private AccountDto recipientAccount;
 
     /** Link to the account of the sender who sent the amount. */
-    private Account senderAccount;
+    private AccountDto senderAccount;
 }
