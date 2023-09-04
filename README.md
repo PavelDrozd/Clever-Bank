@@ -14,6 +14,7 @@
 
 - Java 17
 - Gradle
+- Docker
 - Lombok
 - PostgreSQL
 - HikariCP
@@ -26,9 +27,28 @@
 
 ### Инструкция по запуску проекта:
 
+### Основной запуск через Docker:
+
+- Открыть в терминал в корневой папке проекта и выполнить следующие команды:
+- gradle build war
+- docker-compose up -d
+- docker exec -it postgres sh
+- psql -d postgres -U postgres
+- CREATE DATABASE bankmanager;
+- \c bankmanager
+- \i /opt/app/sql/schema.sql
+- \i /opt/app/sql/data.sql
+- CTRL+D (нажать дважды, чтобы выйти из в базовую консоль)
+- Далее можно зайти в браузер и по ссылке http://localhost:8080/clever/api/*
+  выполнять команды примеры которых написаны ниже
+
+### Альтернативный запуск через Tomcat(Если нет докера):
+
+- Изменить database.url: jdbc:postgresql://localhost:5432/bankmanager
+  в application.yml файле - src/main/resources/application.yml
 - Создать базу данных в PostgreSQL с названием "bankmanager"
   (все конфигурационные параметры можно изменить в файле application.yml - src/main/resources/application.yml)
-- запустить SQL скрипт файл с schema.sql - sql/schema.sql (для тестовых данных можно запустить data.sql)
+- запустить SQL скрипт файл с schema.sql и data.sql (для тестовых данных) в папке docker/sql/
 - открыть консоль в корневой папке проекта и прописать команду: gradle build war
 - зайти в папку build/libs и переместить/скопировать файл: clever.war в папку tomcat/webapps
 - далее в папке tomcat/bin в зависимости от системы запустить скрипт: startup.bat (Windows), startup.sh (Unix systems)
@@ -38,7 +58,7 @@
 
 ### Get by ID:
 
-- послать GET запрос на ссылку: localhost:8080/clever/api/{entity}?id={ID}
+- послать GET запрос на ссылку: http://localhost:8080/clever/api/{entity}?id={ID}
 - {entity} написать название сущности: account, bank, transaction, user
 - {ID} написать значение ID объекта
 - результатом ожидается JSON объект выбранной сущности
@@ -63,7 +83,7 @@
 
 ### Create:
 
-- послать POST запрос по ссылке: localhost:8080/clever/api/create_{entity}
+- послать POST запрос по ссылке: http://localhost:8080/clever/api/create_{entity}
 - {entity} написать название сущности: account, bank, transaction, user
 - в запросе отправить JSON формат создаваемого объекта с заполнением полей кроме поля ID основной сущности
 - результатом ожидается созданный объект
@@ -84,7 +104,7 @@
 
 ### Update:
 
-- послать PUT запрос по ссылке: localhost:8080/clever/api/update_{entity}
+- послать PUT запрос по ссылке: http://localhost:8080/clever/api/update_{entity}
 - {entity} написать название сущности: account, bank, transaction, user
 - результатом ожидается обновленный объект
 
@@ -106,7 +126,7 @@
 ### Delete:
 
 - послать DELETE запрос с телом { "id": (Long) }
-  на : localhost:8080/clever/api/delete_{entity}
+  на : http://localhost:8080/clever/api/delete_{entity}
 - {entity} написать название сущности: account, bank, transaction, user
 - результатом ожидается код 204 без тела ответа
 
@@ -119,7 +139,7 @@
 ### Deposit:
 
 - послать POST запрос с телом { "id": (Long), "value": (Double) }
-  на : localhost:8080/clever/api/deposit
+  на : http://localhost:8080/clever/api/deposit
 - результатом ожидается объект которому была начислена сумма
 
 ##### Пример Deposit:
@@ -133,7 +153,7 @@
 ### Withdraw:
 
 - послать POST запрос с телом { "id": (Long), "value": (Double) }
-  на : localhost:8080/clever/api/withdraw
+  на : http://localhost:8080/clever/api/withdraw
 - результатом ожидается объект у которого была снята сумма
 
 ##### Пример Withdraw:
@@ -147,7 +167,7 @@
 ### Transfer
 
 - послать POST запрос с телом { "senderAccountId": (Long), "recipientAccountId": (Long),  "value": (Double) }
-  на : localhost:8080/clever/api/transfer
+  на : http://localhost:8080/clever/api/transfer
 - результатом ожидается новый созданный объект транзакции
 
 ### Пример Transfer:
@@ -162,4 +182,7 @@
   "bank": { "id": 3, "name": "Trust bank" },
   "user": { "id": 3, "firstName": "Adnrey", "lastName": "Parfenov" } } }
 
-### Чеки хранятся в папке tomcat/bin/cheque
+### Чеки хранятся в папке:
+
+- (Docker сборка) usr/local/tomcat/webapps/cheque
+- (Tomcat сборка) tomcat/bin/cheque
