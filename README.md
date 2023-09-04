@@ -48,7 +48,7 @@
   в application.yml файле - src/main/resources/application.yml
 - Создать базу данных в PostgreSQL с названием "bankmanager"
   (все конфигурационные параметры можно изменить в файле application.yml - src/main/resources/application.yml)
-- запустить SQL скрипт файл с schema.sql и data.sql (для тестовых данных) в папке docker/sql/
+- запустить SQL скрипт файл с schema.sql и data.sql (для тестовых данных) в папке docker/postgres/
 - открыть консоль в корневой папке проекта и прописать команду: gradle build war
 - зайти в папку build/libs и переместить/скопировать файл: clever.war в папку tomcat/webapps
 - далее в папке tomcat/bin в зависимости от системы запустить скрипт: startup.bat (Windows), startup.sh (Unix systems)
